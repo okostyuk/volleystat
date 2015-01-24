@@ -1,0 +1,144 @@
+#
+# generated on 2012/02/02 01:47:47
+#
+# --table-start--
+dataClass=com.oleg.Action
+tableName=actions
+# --table-fields-start--
+# --field-start--
+fieldName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=date
+# --field-end--
+# --field-start--
+fieldName=type
+dataPersister=ENUM_INTEGER
+# --field-end--
+# --field-start--
+fieldName=player
+foreign=true
+# --field-end--
+# --field-start--
+fieldName=game
+foreign=true
+# --field-end--
+# --field-start--
+fieldName=stat
+foreign=true
+# --field-end--
+# --field-start--
+fieldName=isValid
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=com.oleg.Game
+tableName=games
+# --table-fields-start--
+# --field-start--
+fieldName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=team
+foreign=true
+# --field-end--
+# --field-start--
+fieldName=enemyName
+# --field-end--
+# --field-start--
+fieldName=startTime
+# --field-end--
+# --field-start--
+fieldName=endTime
+# --field-end--
+# --field-start--
+fieldName=theirScore
+# --field-end--
+# --field-start--
+fieldName=ourScore
+# --field-end--
+# --field-start--
+fieldName=isValid
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=com.oleg.Player
+tableName=players
+# --table-fields-start--
+# --field-start--
+fieldName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=team
+foreign=true
+# --field-end--
+# --field-start--
+fieldName=name
+# --field-end--
+# --field-start--
+fieldName=stats
+foreignCollection=true
+# --field-end--
+# --field-start--
+fieldName=isValid
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=com.oleg.Stat
+tableName=stats
+# --table-fields-start--
+# --field-start--
+fieldName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=game
+foreign=true
+# --field-end--
+# --field-start--
+fieldName=player
+foreign=true
+# --field-end--
+# --field-start--
+fieldName=date
+# --field-end--
+# --field-start--
+fieldName=type
+dataPersister=ENUM_INTEGER
+# --field-end--
+# --field-start--
+fieldName=value
+dataPersister=ENUM_INTEGER
+# --field-end--
+# --field-start--
+fieldName=isValid
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=com.oleg.Team
+tableName=teams
+# --table-fields-start--
+# --field-start--
+fieldName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=name
+# --field-end--
+# --field-start--
+fieldName=isValid
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
