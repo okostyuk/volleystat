@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">VolleyStat</string>
+    <string name="put">Подача</string>
+    <string name="block">Блок</string>
+    <string name="attack">Атака</string>
+    <string name="plus">+</string>
+    <string name="remove">удалить</string>
+    <string name="replace">замена</string>
+    <string name="apply_team">Утвердить состав</string>
+    <string name="start">Начать игру</string>
+    <string name="error">Ошибка</string>
+    <string name="yes">Да</string>
+    <string name="Cancel">Отмена</string>
+    <string name="shtil">Штиль</string>
+    <string name="enemy">Соперник</string>
+    <string name="save">Сохранить</string>
+    <string name="name">Имя</string>
+    <string name="newgame">Новый Матч</string>
+    <string name="players">Игроки</string>
+    <string name="export">Экспорт</string>
+    <string name="stat">Статистика</string>
+    <string name="new_team">Новая команда</string>
+    <string name="new_player">Новый игрок</string>
+    <string name="team">Команда</string>
+    <string name="testNum">99</string>
+    <string name="filter">фильтр</string>
+    <string name="game">Игра</string>
+    <string name="OK">OK</string>
+    <string name="player">Игрок</string>
+    <string name="all">Все</string>
+
+</resources>

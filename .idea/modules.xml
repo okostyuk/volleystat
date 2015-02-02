@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/volleystat.iml" filepath="$PROJECT_DIR$/volleystat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/volleystat_git.iml" filepath="$PROJECT_DIR$/volleystat_git.iml" />
+      <module fileurl="file://$PROJECT_DIR$/volleystat_new.iml" filepath="$PROJECT_DIR$/volleystat_new.iml" />
     </modules>
   </component>
 </project>
+
