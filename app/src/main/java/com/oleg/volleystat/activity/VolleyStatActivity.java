@@ -4,6 +4,7 @@ import java.util.List;
 
 
 import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
+import com.oleg.volleystat.HelperFactory;
 import com.oleg.volleystat.R;
 import com.oleg.volleystat.db.DatabaseHelper;
 import com.oleg.volleystat.Player;
@@ -42,7 +43,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class VolleyStatActivity extends OrmLiteBaseActivity<DatabaseHelper> {
+public class VolleyStatActivity extends Activity {
 	private static final Object PLAYER_NAME_COLUMN = "1";
 	private static final Object PLAYER_ID_COLUMN = "2";
 	protected static final int CHOOSE_TEAM_DIALOG = 0;
@@ -50,8 +51,7 @@ public class VolleyStatActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 	List<Player> players;
     //DBAdapter dbAdapter;
 	
-	String name = "kostyuk.oleg@gmail.com";
-	String pass = "bvuj46i8";
+
 	String appName  = "oleg-VolleyStat-v1";
 /*
 	SpreadsheetService service;
@@ -81,6 +81,7 @@ public class VolleyStatActivity extends OrmLiteBaseActivity<DatabaseHelper> {
         Button newGameButton = (Button) findViewById(R.id.gameButton);
         Button playersButton = (Button) findViewById(R.id.playersButton);
         Button statButton = (Button) findViewById(R.id.statButton);
+        Button settingsButton = (Button) findViewById(R.id.settingsButton);
 
         //setContentView(main);
         //main.addView(newGameButton);
@@ -90,26 +91,26 @@ public class VolleyStatActivity extends OrmLiteBaseActivity<DatabaseHelper> {
         //main.addView(b);
         b.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				getHelper().exportDB();
+				HelperFactory.getHelper().exportDB();
 			}
 		});
         
         
         newGameButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				showDialog(CHOOSE_TEAM_DIALOG);
+				//showDialog(CHOOSE_TEAM_DIALOG);
 				//Intent intent = new Intent(VolleyStatActivity.this, PositionsActivity.class);
 				//VolleyStatActivity.this.startActivity(intent);
+                Intent intent = new Intent(VolleyStatActivity.this, GameActivity_new.class);
+                VolleyStatActivity.this.startActivity(intent);
 			}
 		});
         
         playersButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				Intent intent = new Intent();
-				intent.setClass(VolleyStatActivity.this, TeamActivity.class);
-				//intent.setClass(VolleyStatActivity.this, SimpleListActivity.class);
-				
-				
+				//intent.setClass(VolleyStatActivity.this, TeamActivity.class);
+
 				VolleyStatActivity.this.startActivity(intent);
 			}
 		});
@@ -117,10 +118,19 @@ public class VolleyStatActivity extends OrmLiteBaseActivity<DatabaseHelper> {
         statButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				Intent intent = new Intent();
-				intent.setClass(VolleyStatActivity.this, StatActivity.class);
+				//intent.setClass(VolleyStatActivity.this, StatActivity.class);
 				VolleyStatActivity.this.startActivity(intent);
 			}
 		});
+
+        settingsButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setClass(VolleyStatActivity.this, SettingsActivity.class);
+                VolleyStatActivity.this.startActivity(intent);
+            }
+        });
         
 /*
 		service = new SpreadsheetService(appName);
@@ -219,7 +229,7 @@ public class VolleyStatActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 		
 		switch(dialogId){
 		case(CHOOSE_TEAM_DIALOG):
-			final List<Team> teams = getHelper().getTeams();
+			final List<Team> teams = HelperFactory.getHelper().getTeams();
 			CharSequence[] items = new CharSequence[teams.size()];
 			for (int i=0; i<teams.size(); i++){
 				items[i] = teams.get(i).getName();
@@ -230,9 +240,9 @@ public class VolleyStatActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 						return;
 					}
 					int teamId = teams.get(which).getId();
-					Intent intent = new Intent(VolleyStatActivity.this, PositionsActivity.class);
-					intent.putExtra(TEAM_ID, teamId);
-					VolleyStatActivity.this.startActivity(intent);
+					//Intent intent = new Intent(VolleyStatActivity.this, PositionsActivity.class);
+					//intent.putExtra(TEAM_ID, teamId);
+					//VolleyStatActivity.this.startActivity(intent);
 				}
 			}).create().show();
 			break;
