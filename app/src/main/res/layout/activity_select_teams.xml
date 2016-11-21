@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_select_teams"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="ua.org.volley.stat.activity.SelectTeamsActivity">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/teamsList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        tools:listitem="@layout/item_team_selectable" />
+</RelativeLayout>
