@@ -139,6 +139,7 @@
         tools:listitem="@layout/item_player"
         android:layout_below="@+id/score"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/button30" />
 
 </RelativeLayout>
