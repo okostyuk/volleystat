@@ -1,224 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Button
-        android:text="99"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/button2"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/button3" />
+    <View
+        android:id="@+id/center"
+        android:layout_centerInParent="true"
+        android:layout_width="0dp"
+        android:layout_height="0dp"/>
 
     <Button
-        android:text="99"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/button4"
-        android:layout_below="@+id/button3"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <Button
-        android:text="99"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/button4"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/button5" />
-
-    <Button
-        android:text="99"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/button5"
-        android:layout_alignRight="@+id/button5"
-        android:layout_alignEnd="@+id/button5"
-        android:id="@+id/button6" />
-
-    <Button
-        android:text="99"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/button8"
-        android:layout_alignLeft="@+id/button8"
-        android:layout_alignStart="@+id/button8"
-        android:id="@+id/button9" />
-
-    <Button
-        android:text="99"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/button10"
-        android:layout_below="@+id/button9"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <Button
-        android:text="99"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/button6"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:id="@+id/button11" />
-
-    <Button
-        android:text="99"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/button11"
-        android:layout_alignLeft="@+id/button11"
-        android:layout_alignStart="@+id/button11"
-        android:id="@+id/button12" />
-
-    <Button
-        android:text="99"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/button12"
-        android:layout_alignLeft="@+id/button12"
-        android:layout_alignStart="@+id/button12"
-        android:id="@+id/button13" />
-
-    <Button
-        android:text="99"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/button7"
-        android:layout_below="@+id/button6"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <Button
-        android:text="99"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/button6"
-        android:layout_toRightOf="@+id/button7"
-        android:layout_toEndOf="@+id/button7"
-        android:id="@+id/button14" />
-
-    <Button
-        android:text="99"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/button12"
-        android:layout_toLeftOf="@+id/button13"
-        android:layout_toStartOf="@+id/button13"
-        android:id="@+id/button15" />
-
-    <ImageButton
-        android:src="@drawable/ic_swap_horiz_black_24dp"
-        android:id="@+id/button20"
-        android:layout_below="@+id/textView"
-        android:layout_centerHorizontal="true"
-        android:layout_width="120dp"
-        android:layout_height="48dp" />
-
-    <TextView
-        android:text="Team 2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/textView2"
-        android:layout_toLeftOf="@+id/button15"
-        android:layout_toStartOf="@+id/button15"
-        android:gravity="center" />
-
-    <Button
-        android:text="99"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/button2"
-        android:layout_below="@+id/textView2"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:text="Team 1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/button2"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:id="@+id/textView3"
-        android:layout_toRightOf="@+id/button14"
-        android:layout_toEndOf="@+id/button14"
-        android:gravity="center" />
-
-    <Button
-        android:text="99"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/button8"
-        android:layout_below="@+id/textView3"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <TextView
-        android:text="25 : 23"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView"
-        android:textSize="36sp"
-        android:layout_alignBaseline="@+id/button2"
-        android:layout_alignBottom="@+id/button2"
-        android:layout_centerHorizontal="true" />
-
-    <Button
-        android:text="подача"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/button18"
-        android:layout_below="@+id/button7"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="14dp"
-        android:layout_toLeftOf="@+id/button24"
-        android:layout_toStartOf="@+id/button24" />
-
-    <Button
-        android:text="прием"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/button19"
-        android:layout_alignBaseline="@+id/button18"
-        android:layout_alignBottom="@+id/button18"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_toRightOf="@+id/button24"
-        android:layout_toEndOf="@+id/button24" />
-
-    <Button
-        android:text="атака"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/button16"
-        android:layout_below="@+id/button18"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/button14"
-        android:layout_alignEnd="@+id/button14" />
-
-    <Button
-        android:text="блок"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/button17"
-        android:layout_below="@+id/button19"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignLeft="@+id/button15"
-        android:layout_alignStart="@+id/button15" />
-
-    <Button
-        android:text="+1"
+        android:text="-1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -227,28 +22,123 @@
         android:id="@+id/button21" />
 
     <Button
-        android:text="-1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/button21"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:id="@+id/button22" />
-
-    <Button
         android:text="0"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/button23"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignTop="@+id/button21"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/button26" />
+
+    <Button
+        android:text="+1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/button26"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/button27" />
+
+    <Button
+        android:text="Атака"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button21"
+        android:id="@+id/button28"
+        android:layout_alignRight="@+id/center"
+        android:layout_alignEnd="@+id/center"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:text="Блок"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button26"
+        android:layout_toRightOf="@+id/button28"
+        android:id="@+id/button29"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:text="Подача"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button28"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/button30" />
 
     <Button
         android:text="Пасс"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/button16"
-        android:layout_alignLeft="@+id/button23"
-        android:layout_alignStart="@+id/button23"
-        android:id="@+id/button24" />
+        android:layout_above="@+id/button28"
+        android:layout_alignLeft="@+id/button26"
+        android:layout_alignStart="@+id/button26"
+        android:id="@+id/button31" />
+
+    <Button
+        android:text="Прием"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button29"
+        android:layout_alignLeft="@+id/button27"
+        android:layout_alignStart="@+id/button27"
+        android:id="@+id/button32" />
+
+    <TextView
+        android:gravity="center"
+        android:textSize="26sp"
+        android:text="23 : 25"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/score"
+        android:layout_alignBottom="@+id/incLeft" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_exposure_neg_1_black_24dp"
+        android:id="@+id/decLeft"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_exposure_plus_1_black_24dp"
+        android:id="@+id/incLeft"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/decLeft"
+        android:layout_toEndOf="@+id/decLeft" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_exposure_neg_1_black_24dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/decRight" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_exposure_plus_1_black_24dp"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/decRight"
+        android:layout_toStartOf="@+id/decRight"
+        android:id="@+id/incRight" />
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:listitem="@layout/item_player"
+        android:layout_below="@+id/score"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
 </RelativeLayout>
