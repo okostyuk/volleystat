@@ -9,7 +9,6 @@ import android.widget.CheckedTextView;
 
 import com.google.firebase.database.Query;
 
-import java.util.ArrayList;
 
 import ua.org.volley.stat.R;
 import ua.org.volley.stat.model.Team;
@@ -20,8 +19,8 @@ import ua.org.volley.stat.model.Team;
 
 public class TeamSelectAdapter extends FirebaseRecyclerAdapter<TeamSelectAdapter.ViewHolder, Team> {
 
-    private String teamOneId = null;
-    private String teamTwoId = null;
+    public String teamOneId = null;
+    public String teamTwoId = null;
 
     public TeamSelectAdapter(Query query, Class<Team> itemClass) {
         super(query, itemClass, null, null);

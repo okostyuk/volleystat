@@ -27,4 +27,12 @@
         android:layout_alignParentEnd="true"
         android:id="@+id/createTestData" />
 
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/newGameButtom"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/progressBar" />
+
 </RelativeLayout>

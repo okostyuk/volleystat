@@ -6,4 +6,7 @@ package ua.org.volley.stat.model;
 
 public class FirebaseRecord {
     public String id;
+
+    public FirebaseRecord() {
+    }
 }

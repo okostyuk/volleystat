@@ -18,4 +18,9 @@ public class Team {
     public String id;
     public String name;
     public List<String> teamPlayers;
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

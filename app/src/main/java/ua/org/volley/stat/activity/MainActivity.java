@@ -37,13 +37,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+        final View progressBar = findViewById(R.id.progressBar);
+
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         mAuth.addAuthStateListener(new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                progressBar.setVisibility(View.GONE);
                 Log.d(TAG, "onAuthStateChanged: " + firebaseAuth.getCurrentUser());
             }
         });
+        progressBar.setVisibility(View.VISIBLE);
         mAuth.signInAnonymously();
     }
 

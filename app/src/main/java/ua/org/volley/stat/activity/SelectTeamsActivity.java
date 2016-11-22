@@ -25,6 +25,7 @@ public class SelectTeamsActivity extends AppCompatActivity {
 
 
     private static final String TAG = "SelectTeamsActivity";
+    private TeamSelectAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +37,7 @@ public class SelectTeamsActivity extends AppCompatActivity {
         list.setLayoutManager(new LinearLayoutManager(this));
 
         DatabaseReference teams = FirebaseDatabase.getInstance().getReference(DBWrapper.TEAMS);
+
         teams.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -48,7 +50,7 @@ public class SelectTeamsActivity extends AppCompatActivity {
             }
         });
 
-        TeamSelectAdapter adapter = new TeamSelectAdapter(teams.orderByValue(), Team.class);
+        adapter = new TeamSelectAdapter(teams.orderByValue(), Team.class);
         list.setAdapter(adapter);
     }
 
@@ -62,7 +64,13 @@ public class SelectTeamsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_teams_selected:
-                startActivity(new Intent(this, GameActivity.class));
+                if (adapter.teamOneId == null || adapter.teamTwoId == null)
+                    return false;
+
+                Intent intent = new Intent(this, GameActivity.class);
+                intent.putExtra(GameActivity.TEAM_ONE, adapter.teamOneId);
+                intent.putExtra(GameActivity.TEAM_TWO, adapter.teamTwoId);
+                startActivity(intent);
                 return true;
         }
         return super.onOptionsItemSelected(item);

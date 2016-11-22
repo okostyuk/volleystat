@@ -3,8 +3,10 @@ package ua.org.volley.stat;
 import android.content.Context;
 
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import ua.org.volley.stat.model.FirebaseRecord;
 import ua.org.volley.stat.model.Player;
@@ -56,5 +58,13 @@ public class DBWrapper {
         DatabaseReference teamRef = database.getReference(name).push();
         record.id = teamRef.getKey();
         teamRef.setValue(record);
+    }
+
+    public static void findRecord(String path, String id, ValueEventListener listener) {
+        database.getReference(path+"/"+id).addListenerForSingleValueEvent(listener);
+    }
+
+    public static void findRecords(String path, ChildEventListener listener){
+        database.getReference(path).addChildEventListener(listener);
     }
 }
