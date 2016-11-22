@@ -29,14 +29,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.createTestData).setOnClickListener(this);
         findViewById(R.id.newGameButtom).setOnClickListener(this);
 
-        findViewById(R.id.newGameButtom).setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                startActivity(new Intent(MainActivity.this, SelectTeamsActivity.class));
-                return true;
-            }
-        });
-
         final View progressBar = findViewById(R.id.progressBar);
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -58,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 createTestData();
                 break;
             case R.id.newGameButtom:
-                startActivity(new Intent(this, GameActivity.class));
+                startActivity(new Intent(this, SelectTeamsActivity.class));
                 break;
         }
     }

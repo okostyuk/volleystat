@@ -1,6 +1,5 @@
 package ua.org.volley.stat.adapters;
 
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,12 +16,12 @@ import ua.org.volley.stat.model.Team;
  * Created by userXЗ on 21.11.2016.
  */
 
-public class TeamSelectAdapter extends FirebaseRecyclerAdapter<TeamSelectAdapter.ViewHolder, Team> {
+public class TeamSelectAdapterFirebase extends FirebaseRecyclerAdapter<TeamSelectAdapterFirebase.ViewHolder, Team> {
 
     public String teamOneId = null;
     public String teamTwoId = null;
 
-    public TeamSelectAdapter(Query query, Class<Team> itemClass) {
+    public TeamSelectAdapterFirebase(Query query, Class<Team> itemClass) {
         super(query, itemClass, null, null);
     }
 

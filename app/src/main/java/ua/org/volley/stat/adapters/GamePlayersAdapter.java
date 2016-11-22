@@ -34,7 +34,7 @@ public class GamePlayersAdapter extends RecyclerView.Adapter<GamePlayersAdapter.
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         TeamPlayer player = players.get(position);
-        holder.number.setText(player.number);
+        holder.number.setText(String.valueOf(player.number));
         holder.name.setText(player.playerName);
     }
 

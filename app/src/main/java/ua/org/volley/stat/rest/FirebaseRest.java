@@ -1,8 +1,10 @@
 package ua.org.volley.stat.rest;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -15,11 +17,11 @@ import ua.org.volley.stat.model.TeamPlayer;
  */
 
 public interface FirebaseRest {
-    @GET("teams.json")
-    Call<List<Team>> loadTeams();
-
     @GET("team_players.json")
-    Call<JsonElement> loadPlayersFiltered(
+    Call<Map<String, TeamPlayer>> loadPlayersFiltered(
             @Query("orderBy") String fieldName,
             @Query("equalTo") String fieldValue);
+
+    @GET("teams.json")
+    Call<Map<String, Team>> loadTeams();
 }

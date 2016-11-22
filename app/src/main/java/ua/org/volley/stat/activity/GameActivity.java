@@ -94,6 +94,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void loadTeam(final int teamIndex, String teamId) {
+        setTitle("Loading teams...");
         DBWrapper.findRecord(DBWrapper.TEAMS, teamId, new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -111,35 +112,32 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private synchronized void teamLoaded() {
-        setTitle(String.valueOf(teams[0]) + " vs " + String.valueOf(teams[1]));
         if (teams[0] != null && teams[1] != null){
+            setTitle("Loading players...");
+            game = createGame();
             loadTeamPlayers(teams[0].id);
         }
     }
 
+    private Game createGame() {
+        return null;
+    }
+
     private void loadTeamPlayers(String teamId) {
-        restService.loadPlayersFiltered("\"teamId\"", "\""+teamId+"\"").enqueue(new Callback<JsonElement>() {
+        restService.loadPlayersFiltered("\"teamId\"", "\""+teamId+"\"").enqueue(new Callback<Map<String, TeamPlayer>>() {
             @Override
-            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+            public void onResponse(Call<Map<String, TeamPlayer>> call, Response<Map<String, TeamPlayer>> response) {
                 if (response.code() == 200){
-                    JsonElement json = response.body();
-                    Set<Map.Entry<String, JsonElement>> set = json.getAsJsonObject().entrySet();
-                    for (Map.Entry<String, JsonElement> item : set){
-                        item.getValue()
-                    }
+                    List<TeamPlayer> players = new ArrayList<>(response.body().values());
                     gamePlayersAdapter = new GamePlayersAdapter(players);
                     playersList.setAdapter(gamePlayersAdapter);
-                }else{
-                    try {
-                        Toast.makeText(GameActivity.this, response.errorBody().string(), Toast.LENGTH_SHORT).show();
-                    } catch (Exception e) {
-                        Log.e(TAG, "onResponse: ", e);
-                    }
+                    setTitle(String.valueOf(teams[0]) + " vs " + String.valueOf(teams[1]));
                 }
             }
 
             @Override
-            public void onFailure(Call<JsonElement> call, Throwable t) {
+            public void onFailure(Call<Map<String, TeamPlayer>> call, Throwable t) {
+
             }
         });
     }
