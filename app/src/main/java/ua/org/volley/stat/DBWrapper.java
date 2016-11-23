@@ -9,6 +9,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import ua.org.volley.stat.model.FirebaseRecord;
+import ua.org.volley.stat.model.Game;
 import ua.org.volley.stat.model.Player;
 import ua.org.volley.stat.model.Team;
 import ua.org.volley.stat.model.TeamPlayer;
@@ -22,6 +23,8 @@ public class DBWrapper {
     public static final String TEAM_PLAYERS = "team_players";
     public static final String TEAMS = "teams";
     public static final String PLAYERS = "players";
+    public static final String GAMES = "games";
+    public static final String STATS = "stats";
 
     private static FirebaseDatabase database;
 
@@ -50,11 +53,11 @@ public class DBWrapper {
 
     public static TeamPlayer createTeamPlayer(Team team, Player player, int number){
         TeamPlayer teamPlayer = new TeamPlayer(team, player, number);
-        saveFirebaseRecord(teamPlayer, TEAM_PLAYERS);
+        addFirebaseRecord(teamPlayer, TEAM_PLAYERS);
         return teamPlayer;
     }
 
-    public static <T extends FirebaseRecord> void saveFirebaseRecord(T record, String name){
+    public static <T extends FirebaseRecord> void addFirebaseRecord(T record, String name){
         DatabaseReference teamRef = database.getReference(name).push();
         record.id = teamRef.getKey();
         teamRef.setValue(record);
@@ -66,5 +69,9 @@ public class DBWrapper {
 
     public static void findRecords(String path, ChildEventListener listener){
         database.getReference(path).addChildEventListener(listener);
+    }
+
+    public static void saveFirebaseRecord(FirebaseRecord record, String path) {
+        database.getReference(path).child(record.id).setValue(record);
     }
 }

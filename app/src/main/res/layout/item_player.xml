@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
     android:layout_width="match_parent"
@@ -16,8 +17,17 @@
         android:layout_width="48dp" />
 
     <TextView
+        android:layout_weight="1"
         tools:text="Some Name may bee looong"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/name" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_done_black_24dp"
+        android:id="@+id/checked"
+        />
+
 </LinearLayout>

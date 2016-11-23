@@ -9,5 +9,6 @@ public class StatRecord extends FirebaseRecord {
     public String playerId;
     public String gameId;
     public String setId;
-    public String type;
+    public String actionType;
+    public Integer value;
 }

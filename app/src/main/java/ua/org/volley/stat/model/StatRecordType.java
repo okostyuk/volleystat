@@ -5,9 +5,10 @@ package ua.org.volley.stat.model;
  */
 
 public enum StatRecordType {
-    PUT,
+    SERVE,
     PASS,
+    SET,
     ATTACK,
-    RECEIVE,
-    BLOCK
+    BLOCK,
+    DIG
 }

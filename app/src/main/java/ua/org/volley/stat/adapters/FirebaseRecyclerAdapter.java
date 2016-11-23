@@ -22,14 +22,14 @@ import java.util.ArrayList;
  *
  * This class is a generic way of backing an Android RecyclerView with a Firebase location.
  * It handles all of the child events at the given Firebase location.
- * It marshals received data into the given class type.
+ * It marshals received data into the given class actionType.
  * Extend this class and provide an implementation of the abstract methods, which will notify when
  * the adapter list changes.
  *
  * This class also simplifies the management of configuration change (e.g.: device rotation)
  * allowing the restore of the list.
  *
- * @param <T> The class type to use as a model for the data contained in the children of the
+ * @param <T> The class actionType to use as a model for the data contained in the children of the
  *            given Firebase location
  */
 public abstract class FirebaseRecyclerAdapter<ViewHolder extends RecyclerView.ViewHolder, T>

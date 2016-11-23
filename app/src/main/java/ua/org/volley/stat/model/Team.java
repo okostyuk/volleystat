@@ -6,7 +6,7 @@ import java.util.List;
  * Created by userXЗ on 21.11.2016.
  */
 
-public class Team {
+public class Team  extends FirebaseRecord{
 
     public Team() {
     }
@@ -15,9 +15,8 @@ public class Team {
         this.name = name;
     }
 
-    public String id;
     public String name;
-    public List<String> teamPlayers;
+    public List<TeamPlayer> teamPlayers;
 
     @Override
     public String toString() {

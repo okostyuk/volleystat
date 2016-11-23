@@ -9,10 +9,23 @@ import java.util.List;
 
 public class Game extends FirebaseRecord {
 
-    public String firstTeamId;
-    public String secondTeamId;
-    public long dateStart;
-    public Long dateEnd;
-    List<GameSet> gameSets = new ArrayList<>();
+    public String teamOneId;
+    public String teamTwoId;
+    public String teamOneName;
+    public String teamTwoName;
 
+    public Long dateStart;
+    public Long dateEnd;
+    public List<GameSet> gameSets = new ArrayList<>();
+
+    public Game() {
+    }
+
+    public Game(Team teamOne, Team teamTwo) {
+        teamOneId = teamOne.id;
+        teamOneName = teamOne.name;
+        teamTwoId = teamTwo.id;
+        teamTwoName = teamTwo.name;
+        dateStart = System.currentTimeMillis();
+    }
 }

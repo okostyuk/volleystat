@@ -7,9 +7,11 @@ package ua.org.volley.stat.model;
 public class ScoreRecord extends FirebaseRecord{
 
     public String gameSetId;
+    public Integer gameSetNum;
     public String gameId;
     public String teamId;
     public String playerId;
     public String statRecordId;
     public Long time;
+    public Integer score;
 }
