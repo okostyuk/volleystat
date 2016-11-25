@@ -63,6 +63,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_game);
         playersList = (RecyclerView) findViewById(R.id.playersList);
         playersList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        playersList.setVisibility(View.INVISIBLE);
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -211,6 +212,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         switch (item.getItemId()){
             case R.id.action_start:
                 startNewSet();
+                playersList.setVisibility(View.VISIBLE);
                 start.setVisible(false);
                 swap.setVisible(false);
                 undo.setVisible(true);
@@ -294,7 +296,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         scoreRecord.score = gameSet.scores.get(teamId);
 
         gameSet.scoreRecords.add(scoreRecord);
-        DBWrapper.saveFirebaseRecord(game, DBWrapper.GAMES);
+        DBWrapper.updateFirebaseRecord(game, DBWrapper.GAMES);
         updateTitle();
     }
 

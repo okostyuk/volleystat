@@ -5,8 +5,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +23,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import ua.org.volley.stat.DBWrapper;
 import ua.org.volley.stat.R;
+import ua.org.volley.stat.adapters.TeamSelectAdapterFirebase;
 import ua.org.volley.stat.adapters.TeamSelectAdapterRest;
 import ua.org.volley.stat.model.Team;
 import ua.org.volley.stat.rest.FirebaseRest;
@@ -54,7 +60,7 @@ public class SelectTeamsActivity extends AppCompatActivity implements Callback<M
         teamsList.setLayoutManager(new LinearLayoutManager(this));
 
         //DatabaseReference teams = FirebaseDatabase.getInstance().getReference(DBWrapper.TEAMS);
-        //adapter = new TeamSelectAdapter(teams.orderByValue(), Team.class);
+        //adapter = new TeamSelectAdapterFirebase(teams.orderByValue(), Team.class);
 
         setTitle("Loading teams...");
         restService.loadTeams().enqueue(this);
@@ -94,6 +100,7 @@ public class SelectTeamsActivity extends AppCompatActivity implements Callback<M
 
     @Override
     public void onFailure(Call<Map<String, Team>> call, Throwable t) {
+        Log.e(TAG, "onFailure: ", t);
         setTitle("Error");
     }
 }

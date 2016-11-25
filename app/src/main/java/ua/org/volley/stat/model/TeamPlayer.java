@@ -8,7 +8,7 @@ public class TeamPlayer extends FirebaseRecord {
     public TeamPlayer() {
     }
 
-    public TeamPlayer(Team team, Player player, int number) {
+    public TeamPlayer(Team team, Player player, String number) {
         teamId = team.id;
         teamName = team.name;
         playerId = player.id;
@@ -18,7 +18,7 @@ public class TeamPlayer extends FirebaseRecord {
 
     public String teamId;
     public String playerId;
-    public int number;
+    public String number;
     public String teamName;
     public String playerName;
 }

@@ -39,6 +39,7 @@ public class GamePlayersAdapter extends RecyclerView.Adapter<GamePlayersAdapter.
         holder.number.setText(String.valueOf(player.number));
         holder.name.setText(player.playerName);
         holder.checked.setVisibility(selectedPlayerPos == position?View.VISIBLE:View.GONE);
+        holder.itemView.setSelected(selectedPlayerPos == position);
     }
 
     @Override

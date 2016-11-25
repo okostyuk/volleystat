@@ -51,7 +51,14 @@ public class DBWrapper {
         return team;
     }
 
-    public static TeamPlayer createTeamPlayer(Team team, Player player, int number){
+    public static Team addTeam(String teamId, String teamName){
+        Team team = new Team(teamName);
+        team.id = teamId;
+        database.getReference(TEAMS).child(teamId).setValue(team);
+        return team;
+    }
+
+    public static TeamPlayer createTeamPlayer(Team team, Player player, String number){
         TeamPlayer teamPlayer = new TeamPlayer(team, player, number);
         addFirebaseRecord(teamPlayer, TEAM_PLAYERS);
         return teamPlayer;
@@ -63,6 +70,7 @@ public class DBWrapper {
         teamRef.setValue(record);
     }
 
+
     public static void findRecord(String path, String id, ValueEventListener listener) {
         database.getReference(path+"/"+id).addListenerForSingleValueEvent(listener);
     }
@@ -71,7 +79,12 @@ public class DBWrapper {
         database.getReference(path).addChildEventListener(listener);
     }
 
-    public static void saveFirebaseRecord(FirebaseRecord record, String path) {
+    public static void updateFirebaseRecord(FirebaseRecord record, String path) {
         database.getReference(path).child(record.id).setValue(record);
     }
+
+    public static void addPlayer(Player player) {
+        database.getReference(PLAYERS).child(player.id).setValue(player);
+    }
+
 }
