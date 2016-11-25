@@ -65,9 +65,14 @@ public class DBWrapper {
     }
 
     public static <T extends FirebaseRecord> void addFirebaseRecord(T record, String name){
-        DatabaseReference teamRef = database.getReference(name).push();
-        record.id = teamRef.getKey();
-        teamRef.setValue(record);
+        if (record.id == null){
+            DatabaseReference teamRef = database.getReference(name).push();
+            record.id = teamRef.getKey();
+            teamRef.setValue(record);
+        }else{
+            DatabaseReference teamRef = database.getReference(name).child(record.id);
+            teamRef.setValue(record);
+        }
     }
 
 

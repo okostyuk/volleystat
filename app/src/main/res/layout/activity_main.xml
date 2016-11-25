@@ -19,6 +19,7 @@
         android:id="@+id/newGameButtom" />
 
     <Button
+        android:enabled="false"
         android:text="Create test data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

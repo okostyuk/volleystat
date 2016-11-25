@@ -10,13 +10,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -55,11 +58,16 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     GamePlayersAdapter gamePlayersAdapter;
     FirebaseRest restService;
     RecyclerView playersList;
-    List<TextView> actionButtons = new ArrayList<>();
+    List<RadioButton> actionButtons = new ArrayList<>();
+    public View radioButtons;
+    View scoreButtons;
+    TextView score;
+    View incLeft, incRight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        DBWrapper.init(this);
         setContentView(R.layout.activity_game);
         playersList = (RecyclerView) findViewById(R.id.playersList);
         playersList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
@@ -77,16 +85,24 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 .build();
         restService = retrofit.create(FirebaseRest.class);
 
-        findViewById(R.id.incLeft).setOnClickListener(this);
-        findViewById(R.id.incRight).setOnClickListener(this);
+        incLeft = findViewById(R.id.incLeft);
+        incLeft.setOnClickListener(this);
+        incRight = findViewById(R.id.incRight);
+        incRight.setOnClickListener(this);
+        incRight.setEnabled(false);
+        incLeft.setEnabled(false);
+
+        radioButtons = findViewById(R.id.radioButtons);
+        scoreButtons = findViewById(R.id.scoreButtons);
+        score = (TextView) findViewById(R.id.score);
 
 
-        TextView serveBtn = (TextView) findViewById(R.id.serve);
-        TextView passBtn = (TextView) findViewById(R.id.pass);
-        TextView attackBtn = (TextView) findViewById(R.id.attack);
-        TextView digBtn = (TextView) findViewById(R.id.dig);
-        TextView setBtn = (TextView) findViewById(R.id.set);
-        TextView blockBtn = (TextView) findViewById(R.id.block);
+        RadioButton serveBtn = (RadioButton) findViewById(R.id.serve);
+        RadioButton passBtn = (RadioButton) findViewById(R.id.pass);
+        RadioButton attackBtn = (RadioButton) findViewById(R.id.attack);
+        RadioButton digBtn = (RadioButton) findViewById(R.id.dig);
+        RadioButton setBtn = (RadioButton) findViewById(R.id.set);
+        RadioButton blockBtn = (RadioButton) findViewById(R.id.block);
 
         serveBtn.setOnClickListener(this);
         passBtn.setOnClickListener(this);
@@ -134,6 +150,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private synchronized void teamLoaded() {
         if (teams[0] != null && teams[1] != null){
             setTitle("Loading players...");
+            start.setVisible(true);
+            swap.setVisible(true);
             game = createGame();
             loadTeamPlayers(teams[0].id);
         }
@@ -141,6 +159,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     private Game createGame() {
         Game newGame = new Game(teams[0], teams[1]);
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
+        newGame.id = fmt.format(new Date())+"_"+teams[0].id+"_vs_"+teams[1].id;
         DBWrapper.addFirebaseRecord(newGame, DBWrapper.GAMES);
         return newGame;
     }
@@ -151,7 +171,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             public void onResponse(Call<Map<String, TeamPlayer>> call, Response<Map<String, TeamPlayer>> response) {
                 if (response.code() == 200){
                     List<TeamPlayer> players = new ArrayList<>(response.body().values());
-                    gamePlayersAdapter = new GamePlayersAdapter(players);
+                    gamePlayersAdapter = new GamePlayersAdapter(GameActivity.this, players);
                     playersList.setAdapter(gamePlayersAdapter);
                     updateTitle();
                 }
@@ -176,6 +196,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private String getTeamScore(Team team) {
         if (team == null) return null;
         if (game == null) return team.name;
+        boolean left = teams[0].id.equals(team.id) && !teamSwaped;
+
         int winnedSets = 0;
         int setScored = 0;
         for (GameSet set : game.gameSets){
@@ -186,11 +208,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         StringBuilder builder = new StringBuilder();
-        builder
-                .append(team.name)
-                .append(" ").append(setScored)
-                .append("(").append(winnedSets).append(")")
-                ;
+        if (left){
+            builder.append(team.name)
+                    .append("(").append(winnedSets).append(")");
+        }else{
+            builder.append("(").append(winnedSets).append(")")
+                    .append(team.name);
+        }
         return builder.toString();
     }
 
@@ -203,6 +227,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         undo = menu.findItem(R.id.action_undo);
         viewLog = menu.findItem(R.id.action_view_log);
 
+        start.setVisible(false);
+        swap.setVisible(false);
         undo.setVisible(false);
         return super.onCreateOptionsMenu(menu);
     }
@@ -216,6 +242,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 start.setVisible(false);
                 swap.setVisible(false);
                 undo.setVisible(true);
+                incRight.setEnabled(true);
+                incLeft.setEnabled(true);
                 break;
             case R.id.action_view_log:
                 break;
@@ -229,6 +257,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     private void startNewSet() {
         GameSet newSet = new GameSet(teams[0], teams[1]);
+        newSet.id = String.valueOf(game.gameSets.size());
         game.gameSets.add(newSet);
         gameSet = newSet;
     }
@@ -243,25 +272,38 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.set:
             case R.id.serve:
             case R.id.pass:
-                for (TextView btn : actionButtons){
-                    btn.setCompoundDrawables(null, null, null, null);
+                for (RadioButton btn : actionButtons){
+                    btn.setChecked(false);
                 }
+                scoreButtons.setVisibility(View.VISIBLE);
+                ((RadioButton)view).setChecked(true);
                 selectedType = btnIdToActionType(view.getId());
-
-                Drawable selected = getResources().getDrawable(R.drawable.ic_done_black_24dp);
-                ((TextView)view).setCompoundDrawables(null, null, selected, null);
                 break;
             case R.id.pos:
-            case R.id.neg:
-            case R.id.neutral:
                 StatRecord statRecord = addStatRecord(view.getId());
-                addScoreRecord(teams[0].id, statRecord);
+                addScoreRecord(true, statRecord);
+                gamePlayersAdapter.setSelected(-1);
+                radioButtons.setVisibility(View.INVISIBLE);
+                scoreButtons.setVisibility(View.INVISIBLE);
+                break;
+            case R.id.neg:
+                statRecord = addStatRecord(view.getId());
+                addScoreRecord(false, statRecord);
+                gamePlayersAdapter.setSelected(-1);
+                radioButtons.setVisibility(View.INVISIBLE);
+                scoreButtons.setVisibility(View.INVISIBLE);
+                break;
+            case R.id.neutral:
+                addStatRecord(view.getId());
+                gamePlayersAdapter.setSelected(-1);
+                radioButtons.setVisibility(View.INVISIBLE);
+                scoreButtons.setVisibility(View.INVISIBLE);
                 break;
             case R.id.incLeft:
-                addScoreRecord(teams[teamSwaped?1:0].id, null);
+                addScoreRecord(!teamSwaped, null);
                 break;
             case R.id.incRight:
-                addScoreRecord(teams[teamSwaped?0:1].id, null);
+                addScoreRecord(teamSwaped, null);
                 break;
 
         }
@@ -279,13 +321,21 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void addScoreRecord(String teamId, @Nullable StatRecord statRecord) {
+    private void addScoreRecord(boolean myTeam, @Nullable StatRecord statRecord) {
+        String teamId;
+        if (myTeam && !teamSwaped)
+            teamId = teams[0].id;
+        else
+            teamId = teams[1].id;
+
         int curScore = gameSet.scores.get(teamId);
         gameSet.scores.put(teamId, curScore+1);
+
         ScoreRecord scoreRecord = new ScoreRecord();
         scoreRecord.time= System.currentTimeMillis();
         scoreRecord.gameId = game.id;
         scoreRecord.teamId = teamId;
+
         int setNum = game.gameSets.indexOf(gameSet)+1;
         scoreRecord.gameSetId = gameSet.id;
         scoreRecord.gameSetNum = setNum;
@@ -297,6 +347,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         gameSet.scoreRecords.add(scoreRecord);
         DBWrapper.updateFirebaseRecord(game, DBWrapper.GAMES);
+
+        if (!teamSwaped){
+            score.setText(gameSet.scores.get(teams[0].id)+" : " + gameSet.scores.get(teams[1].id));
+        }else{
+            score.setText(gameSet.scores.get(teams[1].id)+" : " + gameSet.scores.get(teams[0].id));
+        }
         updateTitle();
     }
 
@@ -316,5 +372,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         DBWrapper.addFirebaseRecord(statRecord, DBWrapper.STATS);
         return statRecord;
 
+    }
+
+    public void onActionClick(View view){
+        selectedType = btnIdToActionType(view.getId());
+/*        switch (view.getId()){
+            case R.id.dig:
+                ((RadioButton)view).setChecked(true);
+        }*/
     }
 }

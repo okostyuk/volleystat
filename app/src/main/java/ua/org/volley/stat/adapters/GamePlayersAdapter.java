@@ -10,6 +10,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import ua.org.volley.stat.R;
+import ua.org.volley.stat.activity.GameActivity;
 import ua.org.volley.stat.model.Player;
 import ua.org.volley.stat.model.TeamPlayer;
 
@@ -20,9 +21,11 @@ import ua.org.volley.stat.model.TeamPlayer;
 public class GamePlayersAdapter extends RecyclerView.Adapter<GamePlayersAdapter.ViewHolder> {
     private final List<TeamPlayer> players;
     static int selectedPlayerPos = -1;
+    GameActivity activity;
 
-    public GamePlayersAdapter(List<TeamPlayer> players) {
+    public GamePlayersAdapter(GameActivity activity, List<TeamPlayer> players) {
         this.players = players;
+        this.activity = activity;
     }
 
     @Override
@@ -53,6 +56,13 @@ public class GamePlayersAdapter extends RecyclerView.Adapter<GamePlayersAdapter.
         return players.get(selectedPlayerPos);
     }
 
+    public void setSelected(int selected) {
+        int oldSelected = selectedPlayerPos;
+        selectedPlayerPos = selected;
+        notifyItemChanged(oldSelected);
+        notifyItemChanged(selectedPlayerPos);
+    }
+
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final TextView number, name;
@@ -72,6 +82,7 @@ public class GamePlayersAdapter extends RecyclerView.Adapter<GamePlayersAdapter.
             selectedPlayerPos = getAdapterPosition();
             notifyItemChanged(oldSelectedPos);
             notifyItemChanged(selectedPlayerPos);
+            activity.radioButtons.setVisibility(View.VISIBLE);
         }
     }
 }
