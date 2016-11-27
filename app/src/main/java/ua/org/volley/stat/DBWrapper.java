@@ -92,4 +92,21 @@ public class DBWrapper {
         database.getReference(PLAYERS).child(player.id).setValue(player);
     }
 
+    public static Team createDefaultTeam(String teamName) {
+        Team team = new Team(teamName);
+        team.id = team.name;
+        DBWrapper.addTeam(team.name, team.name);
+        for (int i=1; i<=12; i++){
+            Player player = new Player();
+            player.teams.add(team);
+            player.name = "Неизвестно";
+            player.id = teamName+"-"+i;
+            DBWrapper.addPlayer(player);
+            TeamPlayer teamPlayer = new TeamPlayer(team, player, String.valueOf(i));
+            team.players.put("n"+teamPlayer.number, teamPlayer);
+        }
+        DBWrapper.updateFirebaseRecord(team, DBWrapper.TEAMS);
+
+        return team;
+    }
 }

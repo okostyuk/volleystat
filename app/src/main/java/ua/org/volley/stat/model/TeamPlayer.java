@@ -5,20 +5,19 @@ package ua.org.volley.stat.model;
  */
 
 public class TeamPlayer extends FirebaseRecord {
+    public String teamName;
+    public String teamId;
+
     public TeamPlayer() {
     }
 
     public TeamPlayer(Team team, Player player, String number) {
-        teamId = team.id;
-        teamName = team.name;
         playerId = player.id;
         playerName = player.name;
         this.number = number;
     }
 
-    public String teamId;
     public String playerId;
     public String number;
-    public String teamName;
     public String playerName;
 }

@@ -91,7 +91,10 @@ public class SelectTeamsActivity extends AppCompatActivity implements Callback<M
     @Override
     public void onResponse(Call<Map<String, Team>> call, Response<Map<String, Team>> response) {
         if (response.code() == 200){
-            List<Team> teams = new ArrayList<>(response.body().values());
+            List<Team> teams = new ArrayList<>();
+            if (response.body() != null){
+                teams = new ArrayList<>(response.body().values());
+            }
             adapter = new TeamSelectAdapterRest(teams);
             teamsList.setAdapter(adapter);
             setTitle("Выберите 2 команды");

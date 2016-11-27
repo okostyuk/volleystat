@@ -15,7 +15,7 @@ public class GameSet extends FirebaseRecord {
     public String gameId;
     public String winnerTeamId;
     public Map<String, Integer> scores = new HashMap<>(2);
-    public List<ScoreRecord> scoreRecords = new ArrayList<>();
+    public Map<String,ScoreRecord> scoreRecords = new HashMap<>();
 
     public GameSet() {
     }

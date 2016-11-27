@@ -15,6 +15,7 @@ public class Team  extends FirebaseRecord{
 
     public Team(String name) {
         this.name = name;
+        id = "";
     }
 
     public String name;

@@ -153,7 +153,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             start.setVisible(true);
             swap.setVisible(true);
             game = createGame();
-            loadTeamPlayers(teams[0].id);
+
+            gamePlayersAdapter = new GamePlayersAdapter(GameActivity.this, teams[0].players.values());
+            playersList.setAdapter(gamePlayersAdapter);
+            //playersList.setVisibility(View.VISIBLE);
+            updateTitle();
+            //loadTeamPlayers(teams[0].id);
         }
     }
 
@@ -166,6 +171,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void loadTeamPlayers(String teamId) {
+
         restService.loadPlayersFiltered("\"teamId\"", "\""+teamId+"\"").enqueue(new Callback<Map<String, TeamPlayer>>() {
             @Override
             public void onResponse(Call<Map<String, TeamPlayer>> call, Response<Map<String, TeamPlayer>> response) {
@@ -321,12 +327,17 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    SimpleDateFormat scoreTimeFormat = new SimpleDateFormat("HH-mm");
     private void addScoreRecord(boolean myTeam, @Nullable StatRecord statRecord) {
         String teamId;
-        if (myTeam && !teamSwaped)
+        Team team;
+        if (myTeam && !teamSwaped) {
             teamId = teams[0].id;
-        else
+            team = teams[0];
+        }else{
+            team = teams[1];
             teamId = teams[1].id;
+        }
 
         int curScore = gameSet.scores.get(teamId);
         gameSet.scores.put(teamId, curScore+1);
@@ -343,9 +354,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             scoreRecord.playerId = statRecord.playerId;
             scoreRecord.statRecordId = statRecord.id;
         }
+        Integer team1Score = gameSet.scores.get(teams[0].id);
+        Integer team2Score = gameSet.scores.get(teams[1].id);
         scoreRecord.score = gameSet.scores.get(teamId);
-
-        gameSet.scoreRecords.add(scoreRecord);
+        String key = scoreTimeFormat.format(new Date(scoreRecord.time))
+                +"_"+team.name
+                +"_"+team1Score+"-"+team2Score;
+        gameSet.scoreRecords.put(key, scoreRecord);
         DBWrapper.updateFirebaseRecord(game, DBWrapper.GAMES);
 
         if (!teamSwaped){
@@ -374,11 +389,4 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    public void onActionClick(View view){
-        selectedType = btnIdToActionType(view.getId());
-/*        switch (view.getId()){
-            case R.id.dig:
-                ((RadioButton)view).setChecked(true);
-        }*/
-    }
 }

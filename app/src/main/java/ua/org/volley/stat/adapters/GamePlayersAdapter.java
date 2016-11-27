@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import ua.org.volley.stat.R;
@@ -19,12 +21,12 @@ import ua.org.volley.stat.model.TeamPlayer;
  */
 
 public class GamePlayersAdapter extends RecyclerView.Adapter<GamePlayersAdapter.ViewHolder> {
-    private final List<TeamPlayer> players;
+    private final List<TeamPlayer> players = new ArrayList<>();
     static int selectedPlayerPos = -1;
     GameActivity activity;
 
-    public GamePlayersAdapter(GameActivity activity, List<TeamPlayer> players) {
-        this.players = players;
+    public GamePlayersAdapter(GameActivity activity, Collection<TeamPlayer> players) {
+        this.players.addAll(players);
         this.activity = activity;
     }
 
