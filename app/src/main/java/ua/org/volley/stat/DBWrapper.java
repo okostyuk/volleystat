@@ -89,6 +89,9 @@ public class DBWrapper {
     }
 
     public static void addPlayer(Player player) {
+        if (player.id == null){
+            player.id = player.name;
+        }
         database.getReference(PLAYERS).child(player.id).setValue(player);
     }
 
@@ -103,7 +106,7 @@ public class DBWrapper {
             player.id = teamName+"-"+i;
             DBWrapper.addPlayer(player);
             TeamPlayer teamPlayer = new TeamPlayer(team, player, String.valueOf(i));
-            team.players.put("n"+teamPlayer.number, teamPlayer);
+            team.addPlayer(teamPlayer);
         }
         DBWrapper.updateFirebaseRecord(team, DBWrapper.TEAMS);
 

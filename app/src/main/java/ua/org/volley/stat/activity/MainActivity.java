@@ -78,9 +78,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     teams.put(team.name, team);
                 }
                 player.teamId = team.id;
-
-                Player newPlayer = addPlayer(player, team);
-                team.players.put(newPlayer.id, player);
+                team.addPlayer(player);
+                addPlayer(player, team);
                 DBWrapper.updateFirebaseRecord(team, DBWrapper.TEAMS);
             }
 
@@ -96,7 +95,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         player.teams.add(team);
         DBWrapper.addPlayer(player);
         teamPlayer.playerId = player.id;
-        DBWrapper.addFirebaseRecord(teamPlayer, DBWrapper.TEAM_PLAYERS);
         return player;
     }
 

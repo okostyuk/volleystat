@@ -1,6 +1,8 @@
 package ua.org.volley.stat.activity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,6 +10,9 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -37,6 +42,7 @@ public class SelectTeamsActivity extends AppCompatActivity implements Callback<M
     private TeamSelectAdapterRest adapter;
     private RecyclerView teamsList;
     FirebaseRest restService;
+    private View addTeamButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +69,33 @@ public class SelectTeamsActivity extends AppCompatActivity implements Callback<M
         //adapter = new TeamSelectAdapterFirebase(teams.orderByValue(), Team.class);
 
         setTitle("Loading teams...");
+        addTeamButton = findViewById(R.id.addTeamButton);
+        addTeamButton.setEnabled(false);
         restService.loadTeams().enqueue(this);
+
+
+        addTeamButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final EditText teamnameText = new EditText(SelectTeamsActivity.this);
+                teamnameText.setLayoutParams(new ViewGroup.LayoutParams(-1, -2));
+                teamnameText.setHint("Введите название");
+                new AlertDialog.Builder(SelectTeamsActivity.this)
+                        .setTitle("Новая команда")
+                        .setView(teamnameText)
+                        .setPositiveButton("Добавить", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int btnId) {
+                                String teamName = teamnameText.getText().toString();
+                                Team team = new Team(teamName);
+                                DBWrapper.addFirebaseRecord(team, DBWrapper.TEAMS);
+                                adapter.addTeam(team);
+                            }
+                        })
+                        .setNegativeButton("Отмена", null)
+                        .show();
+            }
+        });
     }
 
     @Override
@@ -98,6 +130,7 @@ public class SelectTeamsActivity extends AppCompatActivity implements Callback<M
             adapter = new TeamSelectAdapterRest(teams);
             teamsList.setAdapter(adapter);
             setTitle("Выберите 2 команды");
+            addTeamButton.setEnabled(true);
         }
     }
 

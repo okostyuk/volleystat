@@ -5,4 +5,12 @@
     <string name="log">Log</string>
     <string name="undo">Отмена</string>
     <string name="add_player">Добавить игрока</string>
+    <string name="cancel">Отмена</string>
+    <string name="save">Сохранить</string>
+    <string name="name">Имя</string>
+    <string name="number">Номер</string>
+    <string name="edit_player">Изменить игрока</string>
+    <string name="teams">Команды</string>
+    <string name="ok">Ok</string>
+    <string name="spare">Запасные</string>
 </resources>

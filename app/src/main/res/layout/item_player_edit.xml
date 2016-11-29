@@ -1,24 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginTop="1dp"
     android:orientation="horizontal"
     android:gravity="center_vertical"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
     android:background="@drawable/background_checkable"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <TextView
+        android:textColor="@android:color/white"
+        android:background="@drawable/circle"
         tools:text="99"
         android:gravity="center"
         android:id="@+id/number"
-        android:layout_width="48dp"
-        android:layout_height="wrap_content" />
+        android:layout_width="36dp"
+        android:layout_height="36dp" />
     <TextView
+        android:textSize="16sp"
+
+        android:paddingLeft="8dp"
         tools:text="Some loooong name"
         android:id="@+id/name"
         android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="wrap_content" />
-    <ImageButton
+    <ImageView
+        android:padding="12dp"
         android:id="@+id/edit"
         android:src="@drawable/ic_create_black_24dp"
         android:layout_width="48dp"

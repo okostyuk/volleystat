@@ -18,6 +18,8 @@
         android:layout_width="48dp" />
 
     <TextView
+        android:textSize="16sp"
+
         android:layout_weight="1"
         tools:text="Some Name may bee looong"
         android:layout_width="wrap_content"

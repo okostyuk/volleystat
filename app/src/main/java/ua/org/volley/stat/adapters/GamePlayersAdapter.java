@@ -25,6 +25,8 @@ public class GamePlayersAdapter extends RecyclerView.Adapter<GamePlayersAdapter.
     static int selectedPlayerPos = -1;
     GameActivity activity;
 
+
+
     public GamePlayersAdapter(GameActivity activity, Collection<TeamPlayer> players) {
         this.players.addAll(players);
         this.activity = activity;

@@ -1,18 +1,22 @@
 package ua.org.volley.stat.activity;
 
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -32,6 +36,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import ua.org.volley.stat.DBWrapper;
 import ua.org.volley.stat.R;
+import ua.org.volley.stat.adapters.EditTeamAdapter;
 import ua.org.volley.stat.adapters.GamePlayersAdapter;
 import ua.org.volley.stat.model.Game;
 import ua.org.volley.stat.model.GameSet;
@@ -42,7 +47,10 @@ import ua.org.volley.stat.model.Team;
 import ua.org.volley.stat.model.TeamPlayer;
 import ua.org.volley.stat.rest.FirebaseRest;
 
-public class GameActivity extends AppCompatActivity implements View.OnClickListener {
+public class GameActivity extends AppCompatActivity
+        implements View.OnClickListener, FirebaseAuth.AuthStateListener {
+
+    private static final SimpleDateFormat scoreTimeFormat = new SimpleDateFormat("HH-mm-ss");
 
 
     public static final String TEAM_ONE = "teamOne";
@@ -127,7 +135,30 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         loadTeam(0, teamOneId);
         loadTeam(1, teamTwoId);
+
+        mAuth = FirebaseAuth.getInstance();
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(this);
+    }
+
+    @Override
+    protected void onStop() {
+        if (mAuth != null) mAuth.removeAuthStateListener(this);
+        super.onStop();
+    }
+
+    @Override
+    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+        Log.d(TAG, "onAuthStateChanged: " + firebaseAuth.getCurrentUser());
+    }
+
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+
 
     private void loadTeam(final int teamIndex, String teamId) {
         setTitle("Loading teams...");
@@ -154,75 +185,29 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             swap.setVisible(true);
             game = createGame();
 
-            gamePlayersAdapter = new GamePlayersAdapter(GameActivity.this, teams[0].players.values());
-            playersList.setAdapter(gamePlayersAdapter);
-            //playersList.setVisibility(View.VISIBLE);
+            EditTeamAdapter adapter = new EditTeamAdapter(teams[0]);
+            playersList.setAdapter(adapter);
+            playersList.setVisibility(View.VISIBLE);
+
             updateTitle();
-            //loadTeamPlayers(teams[0].id);
         }
     }
 
     private Game createGame() {
         Game newGame = new Game(teams[0], teams[1]);
+        newGame.uid = mAuth.getCurrentUser().getUid();
+        newGame.email = mAuth.getCurrentUser().getEmail();
         SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
         newGame.id = fmt.format(new Date())+"_"+teams[0].id+"_vs_"+teams[1].id;
         DBWrapper.addFirebaseRecord(newGame, DBWrapper.GAMES);
         return newGame;
     }
 
-    private void loadTeamPlayers(String teamId) {
-
-        restService.loadPlayersFiltered("\"teamId\"", "\""+teamId+"\"").enqueue(new Callback<Map<String, TeamPlayer>>() {
-            @Override
-            public void onResponse(Call<Map<String, TeamPlayer>> call, Response<Map<String, TeamPlayer>> response) {
-                if (response.code() == 200){
-                    List<TeamPlayer> players = new ArrayList<>(response.body().values());
-                    gamePlayersAdapter = new GamePlayersAdapter(GameActivity.this, players);
-                    playersList.setAdapter(gamePlayersAdapter);
-                    updateTitle();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Map<String, TeamPlayer>> call, Throwable t) {
-
-            }
-        });
-    }
-
     private void updateTitle() {
-        String leftTeamScore = getTeamScore(teams[0]);
-        String rightTeamScore = getTeamScore(teams[1]);
-        if (teamSwaped)
-            setTitle(rightTeamScore + " vs " + leftTeamScore);
-        else
-            setTitle(leftTeamScore + " vs " + rightTeamScore);
+        if (teamSwaped) setTitle(teams[1].name + " vs " + teams[0].name);
+        else setTitle(teams[0].name + " vs " + teams[1].name);
     }
 
-    private String getTeamScore(Team team) {
-        if (team == null) return null;
-        if (game == null) return team.name;
-        boolean left = teams[0].id.equals(team.id) && !teamSwaped;
-
-        int winnedSets = 0;
-        int setScored = 0;
-        for (GameSet set : game.gameSets){
-            if (team.id.equals(set.winnerTeamId)){
-                winnedSets++;
-            }else if (set.winnerTeamId == null){
-                setScored = set.scores.get(team.id);
-            }
-        }
-        StringBuilder builder = new StringBuilder();
-        if (left){
-            builder.append(team.name)
-                    .append("(").append(winnedSets).append(")");
-        }else{
-            builder.append("(").append(winnedSets).append(")")
-                    .append(team.name);
-        }
-        return builder.toString();
-    }
 
     MenuItem start, swap, undo, viewLog;
     @Override
@@ -243,6 +228,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_start:
+                if (teams[0].players.size() < 6){
+                    Toast.makeText(this, "Нужно 6 игроков", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+
+                gamePlayersAdapter = new GamePlayersAdapter(GameActivity.this, teams[0].players.values());
+                playersList.setAdapter(gamePlayersAdapter);
                 startNewSet();
                 playersList.setVisibility(View.VISIBLE);
                 start.setVisible(false);
@@ -250,15 +242,21 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 undo.setVisible(true);
                 incRight.setEnabled(true);
                 incLeft.setEnabled(true);
+                updateScore();
                 break;
             case R.id.action_view_log:
                 break;
             case R.id.action_swap:
-                teamSwaped = !teamSwaped;
+                swapTeams();
                 break;
         }
-        updateTitle();
+        //updateTitle();
         return super.onOptionsItemSelected(item);
+    }
+
+    private void swapTeams() {
+        teamSwaped = !teamSwaped;
+        updateTitle();
     }
 
     private void startNewSet() {
@@ -327,11 +325,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    SimpleDateFormat scoreTimeFormat = new SimpleDateFormat("HH-mm");
     private void addScoreRecord(boolean myTeam, @Nullable StatRecord statRecord) {
         String teamId;
         Team team;
-        if (myTeam && !teamSwaped) {
+        if (myTeam) {
             teamId = teams[0].id;
             team = teams[0];
         }else{
@@ -361,14 +358,67 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 +"_"+team.name
                 +"_"+team1Score+"-"+team2Score;
         gameSet.scoreRecords.put(key, scoreRecord);
+        Team winner = getWinner();
+        if (winner != null){
+            gameSet.winnerTeamId = winner.id;
+            int oldScore = game.setScores.get(winner.id);
+            game.setScores.put(winner.id, oldScore+1);
+
+            finishSet(winner);
+        }
         DBWrapper.updateFirebaseRecord(game, DBWrapper.GAMES);
 
-        if (!teamSwaped){
-            score.setText(gameSet.scores.get(teams[0].id)+" : " + gameSet.scores.get(teams[1].id));
+        updateScore();
+    }
+
+    private void finishSet(Team winner) {
+        swapTeams();
+        //gamePlayersAdapter = new GamePlayersAdapter(GameActivity.this, teams[0].players.values());
+        EditTeamAdapter adapter = new EditTeamAdapter(teams[0]);
+        playersList.setAdapter(adapter);
+        //startNewSet();
+        playersList.setVisibility(View.VISIBLE);
+        start.setVisible(true);
+        swap.setVisible(true);
+        undo.setVisible(false);
+        incRight.setEnabled(false);
+        incLeft.setEnabled(false);
+
+        radioButtons.setVisibility(View.GONE);
+        scoreButtons.setVisibility(View.GONE);
+    }
+
+    private Team getWinner() {
+        Integer score1 = gameSet.scores.get(teams[0].id);
+        Integer score2 = gameSet.scores.get(teams[1].id);
+
+        if (score1.compareTo(25) >= 0 && (score1 - score2) >= 2)
+            return teams[0];
+
+        if (score2.compareTo(25) >= 0 && (score2 - score1) >= 2)
+            return teams[1];
+
+        return null;
+    }
+
+    private void updateScore() {
+        if (teamSwaped){
+            score.setText(
+                    "(" + game.setScores.get(teams[1].id)+ ")" +
+                    " " + gameSet.scores.get(teams[1].id) +
+                            " : " +
+                            gameSet.scores.get(teams[0].id) +
+                            " (" + game.setScores.get(teams[0].id)+ ")"
+            );
         }else{
-            score.setText(gameSet.scores.get(teams[1].id)+" : " + gameSet.scores.get(teams[0].id));
+            score.setText(
+                    "(" + game.setScores.get(teams[0].id)+ ")" +
+                            " " + gameSet.scores.get(teams[0].id) +
+                            " : " +
+                            gameSet.scores.get(teams[1].id) +
+                            " (" + game.setScores.get(teams[1].id)+ ")"
+            );
         }
-        updateTitle();
     }
 
     private StatRecord addStatRecord(int btnId) {
@@ -388,5 +438,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         return statRecord;
 
     }
+
 
 }

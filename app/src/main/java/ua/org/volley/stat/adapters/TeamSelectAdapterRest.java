@@ -34,8 +34,6 @@ public class TeamSelectAdapterRest extends RecyclerView.Adapter<TeamSelectAdapte
     private final List<Team> teams = new ArrayList<>();
 
     public TeamSelectAdapterRest(List<Team> teams) {
-
-        this.teams.add(new Team("Добавить команду"));
         this.teams.addAll(teams);
     }
 
@@ -64,6 +62,11 @@ public class TeamSelectAdapterRest extends RecyclerView.Adapter<TeamSelectAdapte
         return teams.size();
     }
 
+    public void addTeam(Team team) {
+        teams.add(0, team);
+        notifyItemInserted(0);
+    }
+
     class VH extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public VH(View itemView) {
@@ -76,25 +79,6 @@ public class TeamSelectAdapterRest extends RecyclerView.Adapter<TeamSelectAdapte
 
         @Override
         public void onClick(View view) {
-            if (getAdapterPosition() == 0){
-                Context context = view.getContext();
-                final EditText teamnameText = new EditText(context);
-                teamnameText.setLayoutParams(new ViewGroup.LayoutParams(-1, -2));
-                teamnameText.setHint("Введите название");
-                new AlertDialog.Builder(context)
-                        .setTitle("Новая команда")
-                        .setView(teamnameText)
-                        .setPositiveButton("Добавить", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int btnId) {
-                                String teamName = teamnameText.getText().toString();
-                                new CreateTeamTask().execute(teamName);
-                            }
-                        })
-                        .setNegativeButton("Отмена", null)
-                        .show();
-                return;
-            }
             Team team = getItem(getAdapterPosition());
             if (team.id.equals(teamOneId)){
                 teamOneId = "none1";
@@ -122,19 +106,4 @@ public class TeamSelectAdapterRest extends RecyclerView.Adapter<TeamSelectAdapte
         }
     }
 
-    class CreateTeamTask extends AsyncTask<String, Void, Team> {
-
-        @Override
-        protected Team doInBackground(String... strings) {
-            Team team = DBWrapper.createDefaultTeam(strings[0]);
-
-            return team;
-        }
-
-        @Override
-        protected void onPostExecute(Team team) {
-            teams.add(1, team);
-            notifyItemInserted(teams.indexOf(team));
-        }
-    }
 }

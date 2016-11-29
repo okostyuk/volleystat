@@ -15,11 +15,16 @@ public class Team  extends FirebaseRecord{
 
     public Team(String name) {
         this.name = name;
-        id = "";
+        id = name;
     }
 
     public String name;
     public Map<String, TeamPlayer> players = new HashMap<>();
+
+    public void addPlayer(TeamPlayer teamPlayer){
+        teamPlayer.id = "n"+teamPlayer.number;
+        players.put(teamPlayer.id, teamPlayer);
+    }
 
     @Override
     public String toString() {
