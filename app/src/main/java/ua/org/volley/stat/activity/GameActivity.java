@@ -31,6 +31,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,7 +69,6 @@ public class GameActivity extends AppCompatActivity
 
     Game game;
     GameSet gameSet;
-    StatRecordType selectedType = null;
     Team[] teams = new Team[2];
 
     boolean teamSwaped = false;
@@ -181,11 +181,12 @@ public class GameActivity extends AppCompatActivity
         }
     }
 
+    private static final SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
     private Game createGame() {
         Game newGame = new Game(teams[0], teams[1]);
         newGame.uid = mAuth.getCurrentUser().getUid();
         newGame.email = mAuth.getCurrentUser().getEmail();
-        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
+
         newGame.id = fmt.format(new Date())+"_"+teams[0].id+"_vs_"+teams[1].id;
         DBWrapper.addFirebaseRecord(newGame, DBWrapper.GAMES);
         return newGame;
@@ -267,49 +268,15 @@ public class GameActivity extends AppCompatActivity
     @Override
     public void onClick(View view) {
         switch (view.getId()){
-/*            case R.id.attack:
-            case R.id.dig:
-            case R.id.block:
-            case R.id.set:
-            case R.id.serve:
-            case R.id.pass:
-                for (RadioButton btn : actionButtons){
-                    btn.setChecked(false);
-                }
-                scoreButtons.setVisibility(View.VISIBLE);
-                ((RadioButton)view).setChecked(true);
-                selectedType = btnIdToActionType(view.getId());
-                break;
-            case R.id.pos:
-                StatRecord statRecord = addStatRecord(view.getId());
-                addScoreRecord(true, statRecord);
-                gamePlayersAdapter.setSelected(-1);
-                radioButtons.setVisibility(View.GONE);
-                scoreButtons.setVisibility(View.GONE);
-                break;
-            case R.id.neg:
-                statRecord = addStatRecord(view.getId());
-                addScoreRecord(false, statRecord);
-                gamePlayersAdapter.setSelected(-1);
-                radioButtons.setVisibility(View.GONE);
-                scoreButtons.setVisibility(View.GONE);
-                break;
-            case R.id.neutral:
-                addStatRecord(view.getId());
-                gamePlayersAdapter.setSelected(-1);
-                radioButtons.setVisibility(View.GONE);
-                scoreButtons.setVisibility(View.GONE);
-                break;*/
             case R.id.incLeft:
-                addScoreRecord(!teamSwaped, null);
+                addScoreRecord(!teamSwaped, null, null);
                 break;
             case R.id.incRight:
-                addScoreRecord(teamSwaped, null);
+                addScoreRecord(teamSwaped, null, null);
                 break;
             case R.id.addPlayerButton:
                 showPlayerDialog(new TeamPlayer(), teams[0]);
                 break;
-
         }
     }
 
@@ -382,7 +349,7 @@ public class GameActivity extends AppCompatActivity
     }
 
 
-    private void addScoreRecord(boolean myTeam, @Nullable StatRecord statRecord) {
+    private void addScoreRecord(boolean myTeam, @Nullable StatRecord statRecord, TeamPlayer teamPlayer) {
         String teamId;
         Team team;
         if (myTeam) {
@@ -404,13 +371,18 @@ public class GameActivity extends AppCompatActivity
         int setNum = game.gameSets.indexOf(gameSet)+1;
         scoreRecord.gameSetId = gameSet.id;
         scoreRecord.gameSetNum = setNum;
+
         if (statRecord != null){
-            scoreRecord.playerId = statRecord.playerId;
             scoreRecord.statRecordId = statRecord.id;
+            scoreRecord.action = statRecord.actionType;
         }
+
+        if(teamPlayer != null)
+            scoreRecord.teamPlayer = teamPlayer;
+
         Integer team1Score = gameSet.scores.get(teams[0].id);
         Integer team2Score = gameSet.scores.get(teams[1].id);
-        scoreRecord.score = gameSet.scores.get(teamId);
+        scoreRecord.score = new HashMap<>(gameSet.scores);
         String key = scoreTimeFormat.format(new Date(scoreRecord.time))
                 +"_"+team.name
                 +"_"+team1Score+"-"+team2Score;
@@ -479,7 +451,6 @@ public class GameActivity extends AppCompatActivity
 
     private StatRecord addStatRecord(StatRecord statRecord) {
         statRecord.gameId = game.id;
-        statRecord.playerId = gamePlayersAdapter.getSelectedPlayer().playerId;
         statRecord.setId = gameSet.id;
 
         DBWrapper.addFirebaseRecord(statRecord, DBWrapper.STATS);
@@ -489,12 +460,13 @@ public class GameActivity extends AppCompatActivity
 
 
     @Override
-    public void onStatCreated(StatRecord statRecord) {
+    public void onStatCreated(StatRecord statRecord, TeamPlayer player) {
         addStatRecord(statRecord);
         if (statRecord.value != 0){
             addScoreRecord(
                     statRecord.value > 0,
-                    statRecord);
+                    statRecord,
+                    player);
         }
 
     }

@@ -1,6 +1,9 @@
 package ua.org.volley.stat.adapters;
 
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,10 +25,11 @@ import ua.org.volley.stat.model.TeamPlayer;
  */
 
 public class GamePlayersAdapter extends RecyclerView.Adapter<GamePlayersAdapter.ViewHolder> {
-    private final List<TeamPlayer> players = new ArrayList<>();
-    static int selectedPlayerPos = -1;
-    GameActivity activity;
 
+    private final List<TeamPlayer> players = new ArrayList<>();
+    private final List<TeamPlayer> sparePlayers = new ArrayList<>();
+
+    GameActivity activity;
 
 
     public GamePlayersAdapter(GameActivity activity, Collection<TeamPlayer> players) {
@@ -47,7 +51,7 @@ public class GamePlayersAdapter extends RecyclerView.Adapter<GamePlayersAdapter.
         holder.number.setText(String.valueOf(player.number));
         holder.name.setText(player.playerName);
         //holder.checked.setVisibility(selectedPlayerPos == position?View.VISIBLE:View.GONE);
-        holder.itemView.setSelected(selectedPlayerPos == position);
+        //holder.itemView.setSelected(selectedPlayerPos == position);
     }
 
     @Override
@@ -55,18 +59,6 @@ public class GamePlayersAdapter extends RecyclerView.Adapter<GamePlayersAdapter.
         return players.size();
     }
 
-    public TeamPlayer getSelectedPlayer() {
-        if (selectedPlayerPos == -1)
-            return null;
-        return players.get(selectedPlayerPos);
-    }
-
-    public void setSelected(int selected) {
-        int oldSelected = selectedPlayerPos;
-        selectedPlayerPos = selected;
-        notifyItemChanged(oldSelected);
-        notifyItemChanged(selectedPlayerPos);
-    }
 
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -83,11 +75,50 @@ public class GamePlayersAdapter extends RecyclerView.Adapter<GamePlayersAdapter.
 
         @Override
         public void onClick(View view) {
-            int oldSelectedPos = selectedPlayerPos;
-            selectedPlayerPos = getAdapterPosition();
-            notifyItemChanged(oldSelectedPos);
-            notifyItemChanged(selectedPlayerPos);
-            new ScoreDialog(players.get(selectedPlayerPos), activity).show();
+            new ScoreDialog(players.get(getAdapterPosition()), activity).show();
+        }
+    }
+
+    private class ReplaceCallback extends ItemTouchHelper.SimpleCallback
+            implements DialogInterface.OnClickListener{
+
+        public ReplaceCallback() {
+            super(0, ItemTouchHelper.LEFT|ItemTouchHelper.RIGHT);
+        }
+
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+            CharSequence[] dialogPlayers = new CharSequence[sparePlayers.size()];
+            for (int i=0; i<sparePlayers.size(); i++){
+                dialogPlayers[i] = sparePlayers.get(i).number + " " + sparePlayers.get(i).playerName;
+            }
+            final int index = viewHolder.getAdapterPosition();
+            final TeamPlayer playerOut = players.get(index);
+            players.remove(index);
+            notifyItemRemoved(index);
+
+            new AlertDialog.Builder(activity)
+                    .setTitle(playerOut.number + " " + playerOut.playerName)
+                    .setItems(dialogPlayers, this)
+                    .setPositiveButton(R.string.replace, this)
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            players.add(index, playerOut);
+                            notifyItemInserted(index);
+                        }
+                    })
+                    .show();
+        }
+
+        @Override
+        public void onClick(DialogInterface dialogInterface, int i) {
+
         }
     }
 }

@@ -21,10 +21,10 @@ import ua.org.volley.stat.model.TeamPlayer;
  */
 
 public class ScoreDialog implements View.OnClickListener {
-    Dialog dialog;
-    List<RadioButton> actionButtons = new ArrayList<>();
-    Listener listener;
-    TeamPlayer player;
+    private final Dialog dialog;
+    private List<RadioButton> actionButtons = new ArrayList<>();
+    private Listener listener;
+    private TeamPlayer player;
 
 
     public ScoreDialog(TeamPlayer player, GameActivity context) {
@@ -83,7 +83,7 @@ public class ScoreDialog implements View.OnClickListener {
                 int value = btnIdToScore(view.getId());
                 StatRecord statRecord = createStatRecord(selectedType, value);
                 selectedType = null;
-                listener.onStatCreated(statRecord);
+                listener.onStatCreated(statRecord, player);
                 dialog.dismiss();
                 break;
         }
@@ -123,6 +123,6 @@ public class ScoreDialog implements View.OnClickListener {
     }
 
     public interface Listener {
-        void onStatCreated(StatRecord statRecord);
+        void onStatCreated(StatRecord statRecord, TeamPlayer player);
     }
 }

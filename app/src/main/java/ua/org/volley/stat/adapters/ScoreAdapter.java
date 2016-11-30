@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import ua.org.volley.stat.R;
@@ -17,7 +19,8 @@ import ua.org.volley.stat.model.ScoreRecord;
 
 public class ScoreAdapter extends RecyclerView.Adapter<ScoreAdapter.VH> {
 
-    List<ScoreRecord> items;
+    private final List<ScoreRecord> items;
+    private static final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
 
     public ScoreAdapter(List<ScoreRecord> items) {
         this.items = items;
@@ -33,8 +36,15 @@ public class ScoreAdapter extends RecyclerView.Adapter<ScoreAdapter.VH> {
     @Override
     public void onBindViewHolder(VH holder, int position) {
         ScoreRecord item = items.get(position);
-        holder.setScore.setText(item.score);
-        holder.time.setText(item.time);
+        Integer[] scores = new Integer[2];
+        item.score.values().toArray(scores);
+        holder.setScore.setText(scores[0]+" - " +scores[1]);
+        holder.time.setText(timeFormat.format(new Date(item.time)));
+
+        if(item.teamPlayer != null){
+            holder.player.setText(item.teamPlayer.number + " " + item.teamPlayer.playerName);
+        }
+
     }
 
     @Override
