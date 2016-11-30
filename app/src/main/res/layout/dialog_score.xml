@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <RadioGroup
+        android:visibility="visible"
+        android:id="@+id/radioButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_above="@+id/neg"
+            android:id="@+id/buttonsRow2">
+
+            <RadioButton
+                android:textAllCaps="true"
+                android:text="Защита"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:id="@+id/dig"
+                android:layout_weight="1" />
+
+            <RadioButton
+                android:textAllCaps="true"
+
+                android:text="Блок"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:id="@+id/block"
+                android:layout_weight="1" />
+
+            <RadioButton
+                android:textAllCaps="true"
+
+                android:text="Прием"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:id="@+id/pass"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/buttonsRow1"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="48dp">
+
+            <RadioButton
+                android:textAllCaps="true"
+                android:text="атака"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:id="@+id/attack"
+                android:layout_weight="1" />
+
+            <RadioButton
+                android:textAllCaps="true"
+                android:text="пасс"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:id="@+id/set"
+                android:layout_weight="1" />
+
+            <RadioButton
+                android:textAllCaps="true"
+                android:text="Подача"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:id="@+id/serve"
+                android:layout_weight="1" />
+        </LinearLayout>
+    </RadioGroup>
+
+    <LinearLayout
+        android:paddingTop="24dp"
+        android:visibility="visible"
+
+        android:id="@+id/scoreButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:text="-1"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/neg" />
+
+        <Button
+            android:text="0"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/neutral" />
+
+        <Button
+            android:text="+1"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/pos" />
+    </LinearLayout>
+
+</LinearLayout>

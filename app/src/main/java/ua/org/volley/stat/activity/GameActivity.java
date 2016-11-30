@@ -1,17 +1,24 @@
 package ua.org.volley.stat.activity;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,8 +45,10 @@ import ua.org.volley.stat.DBWrapper;
 import ua.org.volley.stat.R;
 import ua.org.volley.stat.adapters.EditTeamAdapter;
 import ua.org.volley.stat.adapters.GamePlayersAdapter;
+import ua.org.volley.stat.dialogs.ScoreDialog;
 import ua.org.volley.stat.model.Game;
 import ua.org.volley.stat.model.GameSet;
+import ua.org.volley.stat.model.Player;
 import ua.org.volley.stat.model.ScoreRecord;
 import ua.org.volley.stat.model.StatRecord;
 import ua.org.volley.stat.model.StatRecordType;
@@ -48,7 +57,7 @@ import ua.org.volley.stat.model.TeamPlayer;
 import ua.org.volley.stat.rest.FirebaseRest;
 
 public class GameActivity extends AppCompatActivity
-        implements View.OnClickListener, FirebaseAuth.AuthStateListener {
+        implements View.OnClickListener, FirebaseAuth.AuthStateListener, ScoreDialog.Listener {
 
     private static final SimpleDateFormat scoreTimeFormat = new SimpleDateFormat("HH-mm-ss");
 
@@ -66,11 +75,11 @@ public class GameActivity extends AppCompatActivity
     GamePlayersAdapter gamePlayersAdapter;
     FirebaseRest restService;
     RecyclerView playersList;
-    List<RadioButton> actionButtons = new ArrayList<>();
-    public View radioButtons;
-    View scoreButtons;
     TextView score;
     View incLeft, incRight;
+    View addPlayerButton;
+
+    View header;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,35 +109,11 @@ public class GameActivity extends AppCompatActivity
         incRight.setEnabled(false);
         incLeft.setEnabled(false);
 
-        radioButtons = findViewById(R.id.radioButtons);
-        scoreButtons = findViewById(R.id.scoreButtons);
+        addPlayerButton = findViewById(R.id.addPlayerButton);
+        addPlayerButton.setOnClickListener(this);
+
         score = (TextView) findViewById(R.id.score);
 
-
-        RadioButton serveBtn = (RadioButton) findViewById(R.id.serve);
-        RadioButton passBtn = (RadioButton) findViewById(R.id.pass);
-        RadioButton attackBtn = (RadioButton) findViewById(R.id.attack);
-        RadioButton digBtn = (RadioButton) findViewById(R.id.dig);
-        RadioButton setBtn = (RadioButton) findViewById(R.id.set);
-        RadioButton blockBtn = (RadioButton) findViewById(R.id.block);
-
-        serveBtn.setOnClickListener(this);
-        passBtn.setOnClickListener(this);
-        attackBtn.setOnClickListener(this);
-        digBtn.setOnClickListener(this);
-        setBtn.setOnClickListener(this);
-        blockBtn.setOnClickListener(this);
-
-        actionButtons.add(serveBtn);
-        actionButtons.add(passBtn);
-        actionButtons.add(attackBtn);
-        actionButtons.add(digBtn);
-        actionButtons.add(setBtn);
-        actionButtons.add(blockBtn);
-
-        findViewById(R.id.neg).setOnClickListener(this);
-        findViewById(R.id.neutral).setOnClickListener(this);
-        findViewById(R.id.pos).setOnClickListener(this);
 
         String teamOneId = getIntent().getStringExtra(TEAM_ONE);
         String teamTwoId = getIntent().getStringExtra(TEAM_TWO);
@@ -137,6 +122,8 @@ public class GameActivity extends AppCompatActivity
         loadTeam(1, teamTwoId);
 
         mAuth = FirebaseAuth.getInstance();
+        header = findViewById(R.id.header);
+        ((TextView)header.findViewById(R.id.text)).setText("Основные игроки");
     }
 
     @Override
@@ -178,6 +165,7 @@ public class GameActivity extends AppCompatActivity
 
     }
 
+    private EditTeamAdapter editTeamAdapter;
     private synchronized void teamLoaded() {
         if (teams[0] != null && teams[1] != null){
             setTitle("Loading players...");
@@ -185,8 +173,8 @@ public class GameActivity extends AppCompatActivity
             swap.setVisible(true);
             game = createGame();
 
-            EditTeamAdapter adapter = new EditTeamAdapter(teams[0]);
-            playersList.setAdapter(adapter);
+            editTeamAdapter = new EditTeamAdapter(teams[0], this);
+            playersList.setAdapter(editTeamAdapter);
             playersList.setVisibility(View.VISIBLE);
 
             updateTitle();
@@ -228,21 +216,14 @@ public class GameActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_start:
-                if (teams[0].players.size() < 6){
+                List<TeamPlayer> players = editTeamAdapter.getSelectedPlayers();
+
+                if (players.size() < 6){
                     Toast.makeText(this, "Нужно 6 игроков", Toast.LENGTH_SHORT).show();
                     return true;
                 }
 
-                gamePlayersAdapter = new GamePlayersAdapter(GameActivity.this, teams[0].players.values());
-                playersList.setAdapter(gamePlayersAdapter);
                 startNewSet();
-                playersList.setVisibility(View.VISIBLE);
-                start.setVisible(false);
-                swap.setVisible(false);
-                undo.setVisible(true);
-                incRight.setEnabled(true);
-                incLeft.setEnabled(true);
-                updateScore();
                 break;
             case R.id.action_view_log:
                 break;
@@ -257,6 +238,7 @@ public class GameActivity extends AppCompatActivity
     private void swapTeams() {
         teamSwaped = !teamSwaped;
         updateTitle();
+        updateScore();
     }
 
     private void startNewSet() {
@@ -264,13 +246,28 @@ public class GameActivity extends AppCompatActivity
         newSet.id = String.valueOf(game.gameSets.size());
         game.gameSets.add(newSet);
         gameSet = newSet;
+
+        start.setVisible(false);
+        swap.setVisible(false);
+        undo.setVisible(true);
+        incRight.setEnabled(true);
+        incLeft.setEnabled(true);
+        header.setVisibility(View.GONE);
+        playersList.setVisibility(View.VISIBLE);
+        addPlayerButton.setVisibility(View.GONE);
+
+        List<TeamPlayer> players = editTeamAdapter.getSelectedPlayers();
+        gamePlayersAdapter = new GamePlayersAdapter(GameActivity.this, players);
+        playersList.setAdapter(gamePlayersAdapter);
+        gamePlayersAdapter.notifyDataSetChanged();
+        updateScore();
     }
 
 
     @Override
     public void onClick(View view) {
         switch (view.getId()){
-            case R.id.attack:
+/*            case R.id.attack:
             case R.id.dig:
             case R.id.block:
             case R.id.set:
@@ -287,43 +284,103 @@ public class GameActivity extends AppCompatActivity
                 StatRecord statRecord = addStatRecord(view.getId());
                 addScoreRecord(true, statRecord);
                 gamePlayersAdapter.setSelected(-1);
-                radioButtons.setVisibility(View.INVISIBLE);
-                scoreButtons.setVisibility(View.INVISIBLE);
+                radioButtons.setVisibility(View.GONE);
+                scoreButtons.setVisibility(View.GONE);
                 break;
             case R.id.neg:
                 statRecord = addStatRecord(view.getId());
                 addScoreRecord(false, statRecord);
                 gamePlayersAdapter.setSelected(-1);
-                radioButtons.setVisibility(View.INVISIBLE);
-                scoreButtons.setVisibility(View.INVISIBLE);
+                radioButtons.setVisibility(View.GONE);
+                scoreButtons.setVisibility(View.GONE);
                 break;
             case R.id.neutral:
                 addStatRecord(view.getId());
                 gamePlayersAdapter.setSelected(-1);
-                radioButtons.setVisibility(View.INVISIBLE);
-                scoreButtons.setVisibility(View.INVISIBLE);
-                break;
+                radioButtons.setVisibility(View.GONE);
+                scoreButtons.setVisibility(View.GONE);
+                break;*/
             case R.id.incLeft:
                 addScoreRecord(!teamSwaped, null);
                 break;
             case R.id.incRight:
                 addScoreRecord(teamSwaped, null);
                 break;
+            case R.id.addPlayerButton:
+                showPlayerDialog(new TeamPlayer(), teams[0]);
+                break;
 
         }
     }
 
-    private StatRecordType btnIdToActionType(int btnId) {
-        switch (btnId){
-            case R.id.serve: return StatRecordType.SERVE;
-            case R.id.pass: return StatRecordType.PASS;
-            case R.id.set: return StatRecordType.SET;
-            case R.id.block: return StatRecordType.BLOCK;
-            case R.id.attack: return StatRecordType.ATTACK;
-            case R.id.dig: return StatRecordType.DIG;
-            default: return null;
+    public void showPlayerDialog(final TeamPlayer player, final Team team){
+        Context context = this;
+        LinearLayout view = new LinearLayout(context);
+        view.setPadding(8, 8, 8, 8);
+        view.setOrientation(LinearLayout.VERTICAL);
+        view.setLayoutParams(new ViewGroup.LayoutParams(-2,-2));
+        final EditText number = new EditText(context);
+        final EditText name = new EditText(context);
+        number.setLayoutParams(new LinearLayout.LayoutParams(-1,-2));
+        name.setLayoutParams(new LinearLayout.LayoutParams(-1,-2));
+        name.setHint(R.string.name);
+        number.setHint(R.string.number);
+        number.setInputType(InputType.TYPE_CLASS_NUMBER);
+        name.setLines(1);
+
+        view.addView(number);
+        view.addView(name);
+
+        if (player.playerId != null){
+            number.setText(player.number);
+            number.setEnabled(false);
+            name.setText(player.playerName);
+        }else{
+
         }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                .setView(view)
+                .setNegativeButton(R.string.cancel, null)
+                .setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if (number.getText().length() == 0 )
+                            return;
+
+                        player.playerName = name.getText().toString();
+                        player.number = number.getText().toString();
+
+                        if (player.playerId != null){
+                            player.id = "n"+player.number;
+                            DBWrapper.updateFirebaseRecord(
+                                    player,
+                                    "teams/"+team.id+"/players/");
+                            editTeamAdapter.notifyItemChanged(player);
+                        }else{
+                            Player newPlayer = new Player();
+                            newPlayer.name = player.playerName;
+                            newPlayer.teams.add(team);
+                            team.addPlayer(player);
+
+                            DBWrapper.addPlayer(newPlayer);
+                            player.playerId = newPlayer.id;
+                            DBWrapper.updateFirebaseRecord(team, DBWrapper.TEAMS);
+                            editTeamAdapter.add(player);
+                        }
+                    }
+                });
+        if (player.playerId == null){
+            builder.setTitle(R.string.add_player);
+            name.setText(player.playerName);
+            number.setText(player.number);
+        }else{
+            builder.setTitle(R.string.edit_player);
+        }
+        builder.show();
+
     }
+
 
     private void addScoreRecord(boolean myTeam, @Nullable StatRecord statRecord) {
         String teamId;
@@ -372,20 +429,19 @@ public class GameActivity extends AppCompatActivity
     }
 
     private void finishSet(Team winner) {
+        header.setVisibility(View.VISIBLE);
         swapTeams();
-        //gamePlayersAdapter = new GamePlayersAdapter(GameActivity.this, teams[0].players.values());
-        EditTeamAdapter adapter = new EditTeamAdapter(teams[0]);
-        playersList.setAdapter(adapter);
-        //startNewSet();
+        playersList.setAdapter(editTeamAdapter);
         playersList.setVisibility(View.VISIBLE);
         start.setVisible(true);
         swap.setVisible(true);
         undo.setVisible(false);
         incRight.setEnabled(false);
         incLeft.setEnabled(false);
+        addPlayerButton.setVisibility(View.VISIBLE);
 
-        radioButtons.setVisibility(View.GONE);
-        scoreButtons.setVisibility(View.GONE);
+/*        radioButtons.setVisibility(View.GONE);
+        scoreButtons.setVisibility(View.GONE);*/
     }
 
     private Team getWinner() {
@@ -421,18 +477,10 @@ public class GameActivity extends AppCompatActivity
         }
     }
 
-    private StatRecord addStatRecord(int btnId) {
-        StatRecord statRecord = new StatRecord();
+    private StatRecord addStatRecord(StatRecord statRecord) {
         statRecord.gameId = game.id;
         statRecord.playerId = gamePlayersAdapter.getSelectedPlayer().playerId;
         statRecord.setId = gameSet.id;
-        statRecord.actionType = selectedType.name();
-        if (btnId == R.id.pos)
-            statRecord.value = 1;
-        else if (btnId == R.id.neutral)
-            statRecord.value = 0;
-        else if (btnId == R.id.neg)
-            statRecord.value = -1;
 
         DBWrapper.addFirebaseRecord(statRecord, DBWrapper.STATS);
         return statRecord;
@@ -440,4 +488,14 @@ public class GameActivity extends AppCompatActivity
     }
 
 
+    @Override
+    public void onStatCreated(StatRecord statRecord) {
+        addStatRecord(statRecord);
+        if (statRecord.value != 0){
+            addScoreRecord(
+                    statRecord.value > 0,
+                    statRecord);
+        }
+
+    }
 }

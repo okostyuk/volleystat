@@ -12,38 +12,6 @@
         android:layout_width="0dp"
         android:layout_height="0dp"/>
 
-    <LinearLayout
-        tools:visibility="visible"
-        android:visibility="invisible"
-
-        android:id="@+id/scoreButtons"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <Button
-            android:text="-1"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/neg" />
-
-        <Button
-            android:text="0"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/neutral" />
-
-        <Button
-            android:text="+1"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/pos" />
-    </LinearLayout>
-
 
     <TextView
         android:gravity="center"
@@ -79,87 +47,30 @@
         android:layout_toRightOf="@+id/score"
         android:layout_toEndOf="@+id/score" />
 
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        app:fabSize="mini"
+        android:layout_margin="8dp"
+        android:src="@drawable/ic_add_white_24dp"
+        android:id="@+id/addPlayerButton"
+        android:layout_alignBottom="@+id/playersList"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <include android:id="@+id/header" layout="@layout/item_spare_divider"/>
+
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:listitem="@layout/item_player_edit"
-        android:layout_below="@+id/score"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:id="@+id/playersList"
-        android:layout_above="@+id/radioButtons" />
-
-    <RadioGroup
-        tools:visibility="visible"
-        android:visibility="invisible"
-        android:id="@+id/radioButtons"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/scoreButtons"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_above="@+id/neg"
-            android:id="@+id/buttonsRow2">
-
-            <RadioButton
-                android:onClick="onActionClick"
-                android:text="Защита"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/dig"
-                android:layout_weight="1" />
-
-            <RadioButton
-                android:text="Блок"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/block"
-                android:layout_weight="1" />
-
-            <RadioButton
-                android:text="Прием"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/pass"
-                android:layout_weight="1" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/buttonsRow1"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/buttonsRow2"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true">
-
-            <RadioButton
-                android:text="атака"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/attack"
-                android:layout_weight="1" />
-
-            <RadioButton
-                android:text="пасс"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/set"
-                android:layout_weight="1" />
-
-            <RadioButton
-                android:text="Подача"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/serve"
-                android:layout_weight="1" />
-        </LinearLayout>
-    </RadioGroup>
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/score"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 
 </RelativeLayout>

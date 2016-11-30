@@ -13,6 +13,7 @@ import java.util.List;
 
 import ua.org.volley.stat.R;
 import ua.org.volley.stat.activity.GameActivity;
+import ua.org.volley.stat.dialogs.ScoreDialog;
 import ua.org.volley.stat.model.Player;
 import ua.org.volley.stat.model.TeamPlayer;
 
@@ -45,7 +46,7 @@ public class GamePlayersAdapter extends RecyclerView.Adapter<GamePlayersAdapter.
         TeamPlayer player = players.get(position);
         holder.number.setText(String.valueOf(player.number));
         holder.name.setText(player.playerName);
-        holder.checked.setVisibility(selectedPlayerPos == position?View.VISIBLE:View.GONE);
+        //holder.checked.setVisibility(selectedPlayerPos == position?View.VISIBLE:View.GONE);
         holder.itemView.setSelected(selectedPlayerPos == position);
     }
 
@@ -86,7 +87,7 @@ public class GamePlayersAdapter extends RecyclerView.Adapter<GamePlayersAdapter.
             selectedPlayerPos = getAdapterPosition();
             notifyItemChanged(oldSelectedPos);
             notifyItemChanged(selectedPlayerPos);
-            activity.radioButtons.setVisibility(View.VISIBLE);
+            new ScoreDialog(players.get(selectedPlayerPos), activity).show();
         }
     }
 }

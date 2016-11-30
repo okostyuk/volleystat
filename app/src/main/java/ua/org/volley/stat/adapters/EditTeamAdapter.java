@@ -7,17 +7,20 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ua.org.volley.stat.DBWrapper;
 import ua.org.volley.stat.R;
+import ua.org.volley.stat.activity.GameActivity;
 import ua.org.volley.stat.model.Player;
 import ua.org.volley.stat.model.Team;
 import ua.org.volley.stat.model.TeamPlayer;
@@ -30,26 +33,30 @@ public class EditTeamAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private static final int SPARE = 0;
     private static final int EDIT = 1;
-    int SPARE_DIVIDER_POS = 6;
+
     private ItemTouchHelper changeTouchHelper = new ItemTouchHelper(new RemoveCallback());
+    private GameActivity activity;
 
     private List<TeamPlayer> players = new ArrayList<>();
+    private TeamPlayer spare;
     private Team team;
 
-    public EditTeamAdapter(Team team) {
+    public EditTeamAdapter(Team team, GameActivity activity) {
+        this.activity = activity;
         this.team = team;
-        players.add(new TeamPlayer(team, null, null));//space for add player item
-        this.players.addAll(1, team.players.values());
+        this.players.addAll(team.players.values());
+        spare = new TeamPlayer();
+        if (players.size() < 7){
+            players.add(spare);
+        }else{
+            players.add(6, spare);
+        }
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (players.size() < 7){
-            if (position == players.size()-1)
-                return SPARE;
-        }else if(position == SPARE_DIVIDER_POS){
+        if (players.indexOf(spare) == position)
             return SPARE;
-        }
         return EDIT;
     }
 
@@ -65,15 +72,31 @@ public class EditTeamAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder.getItemViewType() == EDIT){
+            TeamPlayer player = players.get(position);
             EditPlayerVH editHolder = ((EditPlayerVH) holder);
-            editHolder.number.setText(players.get(position).number);
-            editHolder.name.setText(players.get(position).playerName);
+            editHolder.number.setText(player.number);
+            editHolder.name.setText(player.playerName);
         }
     }
 
     @Override
     public int getItemCount() {
         return players.size();
+    }
+
+    public void add(TeamPlayer player) {
+        players.add(player);
+        notifyItemInserted(players.size()-1);
+    }
+
+    public void notifyItemChanged(TeamPlayer player) {
+        int pos = players.indexOf(player);
+        notifyItemChanged(pos);
+    }
+
+    public List<TeamPlayer> getSelectedPlayers(){
+        int pos = players.indexOf(spare);
+        return players.subList(0, pos);
     }
 
     private class EditPlayerVH extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -84,101 +107,72 @@ public class EditTeamAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             number = (TextView) itemView.findViewById(R.id.number);
             name = (TextView) itemView.findViewById(R.id.name);
             itemView.setOnClickListener(this);
+            itemView.findViewById(R.id.edit).setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    changeTouchHelper.startDrag(EditPlayerVH.this);
+                    return true;
+                }
+            });
         }
 
         @Override
         public void onClick(View view) {
-            showDialog(view.getContext(), players.get(getAdapterPosition()));
+/*
+            if (view.getId() == R.id.edit)
+                changeTouchHelper.startDrag(this);
+            else
+*/
+                activity.showPlayerDialog(
+                        players.get(getAdapterPosition()),
+                        team
+                );
         }
     }
 
-    private class SpareDividerVH extends RecyclerView.ViewHolder implements View.OnClickListener{
+    private class SpareDividerVH extends RecyclerView.ViewHolder{
         SpareDividerVH(View itemView) {
             super(itemView);
-            itemView.setOnClickListener(this);
-        }
-        @Override
-        public void onClick(View view) {
-            showDialog(view.getContext(), new TeamPlayer(team, null, null));
         }
     }
 
-    private void showDialog(Context context, final TeamPlayer player){
-        LinearLayout view = new LinearLayout(context);
-        view.setPadding(8, 8, 8, 8);
-        view.setOrientation(LinearLayout.VERTICAL);
-        view.setLayoutParams(new ViewGroup.LayoutParams(-2,-2));
-        final EditText number = new EditText(context);
-        final EditText name = new EditText(context);
-        number.setLayoutParams(new LinearLayout.LayoutParams(-1,-2));
-        name.setLayoutParams(new LinearLayout.LayoutParams(-1,-2));
-        name.setHint(R.string.name);
-        number.setHint(R.string.number);
-        number.setInputType(InputType.TYPE_CLASS_NUMBER);
-        name.setLines(1);
 
-        view.addView(number);
-        view.addView(name);
-
-        if (player.playerId != null){
-            number.setText(player.number);
-            number.setEnabled(false);
-            name.setText(player.playerName);
-        }else{
-
-        }
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context)
-                .setView(view)
-                .setNegativeButton(R.string.cancel, null)
-                .setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        if (name.getText().length() == 0 || number.getText().length() == 0 )
-                            return;
-
-                        player.playerName = name.getText().toString();
-                        player.number = number.getText().toString();
-
-                        if (player.playerId != null){
-                            player.id = "n"+player.number;
-                            DBWrapper.updateFirebaseRecord(
-                                    player,
-                                    "teams/"+team.id+"/players/");
-                            notifyItemChanged(players.indexOf(player));
-                        }else{
-                            Player newPlayer = new Player();
-                            newPlayer.name = player.playerName;
-                            newPlayer.teams.add(team);
-                            team.addPlayer(player);
-
-                            DBWrapper.addPlayer(newPlayer);
-                            player.playerId = newPlayer.id;
-                            DBWrapper.updateFirebaseRecord(team, DBWrapper.TEAMS);
-                            players.add(1, player);
-                            notifyItemInserted(1);
-                        }
-                    }
-                });
-        if (player.playerId == null){
-            builder.setTitle(R.string.add_player);
-            name.setText(player.playerName);
-            number.setText(player.number);
-        }else{
-            builder.setTitle(R.string.edit_player);
-        }
-        builder.show();
-
-    }
 
     private class RemoveCallback extends ItemTouchHelper.SimpleCallback{
 
+
+        @Override
+        public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+            super.clearView(recyclerView, viewHolder);
+            viewHolder.itemView.setBackgroundResource(R.drawable.background_checkable);
+        }
+
+        @Override
+        public boolean isLongPressDragEnabled() {
+            return true;
+        }
+
         RemoveCallback() {
-            super(0, ItemTouchHelper.UP|ItemTouchHelper.DOWN);
+            super(ItemTouchHelper.UP|ItemTouchHelper.DOWN, 0);
+        }
+
+        @Override
+        public int getDragDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+            if (viewHolder.getAdapterPosition() == players.indexOf(spare))
+                return 0;
+
+            return super.getDragDirs(recyclerView, viewHolder);
         }
 
         @Override
         public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder src, RecyclerView.ViewHolder dst) {
+            if (src.getAdapterPosition() == players.indexOf(spare))
+                return false;
+
+            TeamPlayer player = players.get(src.getAdapterPosition());
+            players.remove(player);
+            players.add(dst.getAdapterPosition(), player);
+            notifyItemMoved(src.getAdapterPosition(), dst.getAdapterPosition());
             return true;
         }
 
@@ -187,6 +181,14 @@ public class EditTeamAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             int pos = viewHolder.getAdapterPosition();
             players.remove(pos);
             notifyItemRemoved(pos);
+        }
+
+        @Override
+        public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
+            super.onSelectedChanged(viewHolder, actionState);
+            if (viewHolder != null)
+                viewHolder.itemView.setBackgroundColor(activity.getResources().getColor(R.color.colorAccentTransparent));
+
         }
     }
 
