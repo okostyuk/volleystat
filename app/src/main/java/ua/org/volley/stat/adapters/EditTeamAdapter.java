@@ -1,27 +1,18 @@
 package ua.org.volley.stat.adapters;
 
-import android.content.Context;
-import android.content.DialogInterface;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import ua.org.volley.stat.DBWrapper;
 import ua.org.volley.stat.R;
 import ua.org.volley.stat.activity.GameActivity;
-import ua.org.volley.stat.model.Player;
 import ua.org.volley.stat.model.Team;
 import ua.org.volley.stat.model.TeamPlayer;
 
@@ -34,7 +25,7 @@ public class EditTeamAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private static final int SPARE = 0;
     private static final int EDIT = 1;
 
-    private ItemTouchHelper changeTouchHelper = new ItemTouchHelper(new RemoveCallback());
+    private ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new RemoveCallback());
     private GameActivity activity;
 
     private List<TeamPlayer> players = new ArrayList<>();
@@ -94,9 +85,14 @@ public class EditTeamAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         notifyItemChanged(pos);
     }
 
-    public List<TeamPlayer> getSelectedPlayers(){
+    public List<TeamPlayer> getMainPlayers(){
         int pos = players.indexOf(spare);
         return players.subList(0, pos);
+    }
+
+    public List<TeamPlayer> getSparePlayrs() {
+        int pos = players.indexOf(spare);
+        return players.subList(pos+1, players.size());
     }
 
     private class EditPlayerVH extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -110,7 +106,7 @@ public class EditTeamAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             itemView.findViewById(R.id.edit).setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent) {
-                    changeTouchHelper.startDrag(EditPlayerVH.this);
+                    itemTouchHelper.startDrag(EditPlayerVH.this);
                     return true;
                 }
             });
@@ -120,7 +116,7 @@ public class EditTeamAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public void onClick(View view) {
 /*
             if (view.getId() == R.id.edit)
-                changeTouchHelper.startDrag(this);
+                itemTouchHelper.startDrag(this);
             else
 */
                 activity.showPlayerDialog(
@@ -195,11 +191,11 @@ public class EditTeamAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
-        changeTouchHelper.attachToRecyclerView(recyclerView);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
     @Override
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
-        changeTouchHelper.attachToRecyclerView(null);
+        itemTouchHelper.attachToRecyclerView(null);
     }
 }

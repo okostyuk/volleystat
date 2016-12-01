@@ -8,10 +8,13 @@
     tools:context="ua.org.volley.stat.activity.SelectTeamsActivity">
 
     <TextView
-        android:paddingLeft="48dp"
-        android:layout_width="wrap_content"
+        android:textSize="16sp"
+        android:textAllCaps="true"
+        android:textColor="#ffffff"
+        android:background="@color/colorPrimaryDark"
+        android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:gravity="center_vertical"
+        android:gravity="center"
         android:id="@+id/textView"
         android:text="@string/teams" />
 

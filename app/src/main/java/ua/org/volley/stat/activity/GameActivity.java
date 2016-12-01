@@ -2,7 +2,6 @@ package ua.org.volley.stat.activity;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -10,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
@@ -19,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,26 +30,22 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import ua.org.volley.stat.DBWrapper;
 import ua.org.volley.stat.R;
 import ua.org.volley.stat.adapters.EditTeamAdapter;
 import ua.org.volley.stat.adapters.GamePlayersAdapter;
+import ua.org.volley.stat.adapters.ScoreAdapter;
 import ua.org.volley.stat.dialogs.ScoreDialog;
 import ua.org.volley.stat.model.Game;
 import ua.org.volley.stat.model.GameSet;
 import ua.org.volley.stat.model.Player;
 import ua.org.volley.stat.model.ScoreRecord;
 import ua.org.volley.stat.model.StatRecord;
-import ua.org.volley.stat.model.StatRecordType;
 import ua.org.volley.stat.model.Team;
 import ua.org.volley.stat.model.TeamPlayer;
 import ua.org.volley.stat.rest.FirebaseRest;
@@ -80,6 +73,8 @@ public class GameActivity extends AppCompatActivity
     View addPlayerButton;
 
     View header;
+
+    List<ScoreRecord> scoreRecordList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +106,7 @@ public class GameActivity extends AppCompatActivity
 
         addPlayerButton = findViewById(R.id.addPlayerButton);
         addPlayerButton.setOnClickListener(this);
+        addPlayerButton.setEnabled(false);
 
         score = (TextView) findViewById(R.id.score);
 
@@ -168,6 +164,7 @@ public class GameActivity extends AppCompatActivity
     private EditTeamAdapter editTeamAdapter;
     private synchronized void teamLoaded() {
         if (teams[0] != null && teams[1] != null){
+            addPlayerButton.setEnabled(true);
             setTitle("Loading players...");
             start.setVisible(true);
             swap.setVisible(true);
@@ -217,7 +214,7 @@ public class GameActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_start:
-                List<TeamPlayer> players = editTeamAdapter.getSelectedPlayers();
+                List<TeamPlayer> players = editTeamAdapter.getMainPlayers();
 
                 if (players.size() < 6){
                     Toast.makeText(this, "Нужно 6 игроков", Toast.LENGTH_SHORT).show();
@@ -227,6 +224,10 @@ public class GameActivity extends AppCompatActivity
                 startNewSet();
                 break;
             case R.id.action_view_log:
+                if (playersList.getAdapter() == gamePlayersAdapter)
+                    playersList.setAdapter(new ScoreAdapter(scoreRecordList));
+                else
+                    playersList.setAdapter(gamePlayersAdapter);
                 break;
             case R.id.action_swap:
                 swapTeams();
@@ -257,8 +258,9 @@ public class GameActivity extends AppCompatActivity
         playersList.setVisibility(View.VISIBLE);
         addPlayerButton.setVisibility(View.GONE);
 
-        List<TeamPlayer> players = editTeamAdapter.getSelectedPlayers();
-        gamePlayersAdapter = new GamePlayersAdapter(GameActivity.this, players);
+        List<TeamPlayer> mainPlayers = editTeamAdapter.getMainPlayers();
+        List<TeamPlayer> sparePlayers = editTeamAdapter.getSparePlayrs();
+        gamePlayersAdapter = new GamePlayersAdapter(GameActivity.this, mainPlayers, sparePlayers);
         playersList.setAdapter(gamePlayersAdapter);
         gamePlayersAdapter.notifyDataSetChanged();
         updateScore();
@@ -395,9 +397,14 @@ public class GameActivity extends AppCompatActivity
 
             finishSet(winner);
         }
+        scoreRecordList.add(scoreRecord);
         DBWrapper.updateFirebaseRecord(game, DBWrapper.GAMES);
 
-        updateScore();
+        try {
+            updateScore();
+        }catch (Exception ex){
+            Log.e(TAG, "addScoreRecord: ", ex);
+        }
     }
 
     private void finishSet(Team winner) {
@@ -430,6 +437,9 @@ public class GameActivity extends AppCompatActivity
     }
 
     private void updateScore() {
+        if (game == null || gameSet == null || gameSet.scores == null || gameSet.scores.size() == 0)
+            return;
+
         if (teamSwaped){
             score.setText(
                     "(" + game.setScores.get(teams[1].id)+ ")" +

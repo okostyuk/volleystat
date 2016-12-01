@@ -48,6 +48,19 @@
         android:layout_toEndOf="@+id/score" />
 
 
+    <include android:id="@+id/header" layout="@layout/item_spare_divider"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:background="#1E000000"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:listitem="@layout/item_player_edit"
+        android:id="@+id/playersList"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/score"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -57,18 +70,6 @@
         android:src="@drawable/ic_add_white_24dp"
         android:id="@+id/addPlayerButton"
         android:layout_alignBottom="@+id/playersList"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <include android:id="@+id/header" layout="@layout/item_spare_divider"/>
-
-    <android.support.v7.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:listitem="@layout/item_player_edit"
-        android:id="@+id/playersList"
-        android:layout_alignParentBottom="true"
-        android:layout_below="@+id/score"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 

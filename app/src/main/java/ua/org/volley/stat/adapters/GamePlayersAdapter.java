@@ -28,13 +28,15 @@ public class GamePlayersAdapter extends RecyclerView.Adapter<GamePlayersAdapter.
 
     private final List<TeamPlayer> players = new ArrayList<>();
     private final List<TeamPlayer> sparePlayers = new ArrayList<>();
+    private ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new GamePlayersAdapter.ReplaceCallback());
 
     GameActivity activity;
 
 
-    public GamePlayersAdapter(GameActivity activity, Collection<TeamPlayer> players) {
+    public GamePlayersAdapter(GameActivity activity, Collection<TeamPlayer> players, Collection<TeamPlayer> sparePlayers) {
         this.players.addAll(players);
         this.activity = activity;
+        this.sparePlayers.addAll(sparePlayers);
     }
 
     @Override
@@ -59,6 +61,15 @@ public class GamePlayersAdapter extends RecyclerView.Adapter<GamePlayersAdapter.
         return players.size();
     }
 
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+        itemTouchHelper.attachToRecyclerView(null);
+    }
 
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -91,6 +102,7 @@ public class GamePlayersAdapter extends RecyclerView.Adapter<GamePlayersAdapter.
             return false;
         }
 
+        TeamPlayer playerOut;
         @Override
         public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
             CharSequence[] dialogPlayers = new CharSequence[sparePlayers.size()];
@@ -98,7 +110,7 @@ public class GamePlayersAdapter extends RecyclerView.Adapter<GamePlayersAdapter.
                 dialogPlayers[i] = sparePlayers.get(i).number + " " + sparePlayers.get(i).playerName;
             }
             final int index = viewHolder.getAdapterPosition();
-            final TeamPlayer playerOut = players.get(index);
+            playerOut = players.get(index);
             players.remove(index);
             notifyItemRemoved(index);
 
@@ -118,6 +130,13 @@ public class GamePlayersAdapter extends RecyclerView.Adapter<GamePlayersAdapter.
 
         @Override
         public void onClick(DialogInterface dialogInterface, int i) {
+            TeamPlayer playerIn = sparePlayers.get(i);
+            if (playerIn != null){
+                sparePlayers.remove(playerIn);
+                sparePlayers.add(playerOut);
+                players.add(playerIn);
+                notifyItemInserted(players.indexOf(playerIn));
+            }
 
         }
     }
